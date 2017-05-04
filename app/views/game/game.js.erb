@@ -1,0 +1,95 @@
+function numberToPiece(number){
+  if (Number(number) > 0) {
+    var piece = "w"
+  } else if (Number(number) < 0) {
+    var piece = "b"
+  } else {
+    return "";
+  }
+  switch(number.substr(-1)){
+    case "1":
+      piece += "p";
+      break
+    case "2":
+      piece += "n";
+      break
+    case "3":
+      piece += "b";
+      break
+    case "4":
+      piece += "r";
+      break
+    case "5":
+      piece += "q";
+      break
+    case "6":
+      piece += "k";
+      break
+  }
+  return piece;
+}
+
+function drawBoard(boardData) {
+  var counter = 0;
+  $("td").removeClass("wp wn wb wr wq wk bp bn bb br bq bk piece-here");
+  $("tr").each(function(){
+    $(this).find("td").each(function(){
+      $(this).addClass(numberToPiece(boardData[counter]));
+      if ($(this).hasClass(numberToPiece(boardData[counter]))) {
+        $(this).addClass("piece-here");
+      }
+      counter = counter + 1;
+    });
+  });
+}
+
+function originSelect($square){
+  if ($square.hasClass("white")) {
+    var color = "white";
+  } else {
+    var color = "black";
+  }
+  if ($square.hasClass("origin-select-" + color)) {
+    $square.removeClass("origin-select-" + color);
+    pieceSelected = false;
+  } else {
+    $("td").removeClass("origin-select-white");
+    $("td").removeClass("origin-select-black");
+    $square.addClass("origin-select-" + color);
+    pieceSelected = $square.attr("id");
+  }
+}
+
+function destinationSelect($square) {
+  locationSelected = $square.attr("id");
+  $("td").removeClass("origin-select-white");
+  $("td").removeClass("origin-select-black");
+  return pieceSelected + locationSelected;
+}
+
+$("td").click(function(){
+  if ($(this).hasClass("piece-here") || ) {
+    originSelect($(this));
+  } else if (pieceSelected) {
+    var move = destinationSelect($(this));
+    $.ajax({
+      type: "POST",
+      url: "/move",
+      data: { "move" : move },
+      success: function() {
+        $.get("/new", function(data) {
+          boardData = data["data"].split(",");
+          drawBoard(boardData);
+        });
+      }
+    });
+  }
+});
+
+var boardData = "<%= j @board_data %>".split(",");
+
+drawBoard(boardData)
+
+var locationSelected = false;
+
+var pieceSelected = false;
