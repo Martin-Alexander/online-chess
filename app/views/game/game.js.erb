@@ -86,7 +86,10 @@ $("td").click(function(){
   }
 });
 
-var boardData = "<%= j @board_data %>".split(",");
+$.get("/new", function(data) {
+  boardData = data["data"].split(",");
+  drawBoard(boardData);
+});
 
 drawBoard(boardData)
 
