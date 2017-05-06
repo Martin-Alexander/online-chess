@@ -68,7 +68,7 @@ function destinationSelect($square) {
 }
 
 $("td").click(function(){
-  if ($(this).hasClass("piece-here") || ) {
+  if ($(this).hasClass("piece-here")) {
     originSelect($(this));
   } else if (pieceSelected) {
     var move = destinationSelect($(this));
