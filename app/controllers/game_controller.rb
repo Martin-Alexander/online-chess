@@ -16,6 +16,7 @@ class GameController < ApplicationController
     if new_board
       new_board.game = Game.last
       new_board.save
+      ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data }
     end
   end
   
