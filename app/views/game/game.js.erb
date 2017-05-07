@@ -35,6 +35,7 @@ function numberToPiece(number){
 function drawBoard(boardData) {
   var counter = 0;
   $("td").removeClass("wp wn wb wr wq wk bp bn bb br bq bk piece-here");
+  console.log(boardData);
   $("tr").each(function(){
     $(this).find("td").each(function(){
       $(this).addClass(numberToPiece(boardData[counter]));
@@ -78,13 +79,7 @@ $("td").click(function(){
     $.ajax({
       type: "POST",
       url: "/move",
-      data: { "move" : move },
-      success: function() {
-        $.get("/new", function(data) {
-          boardData = data["data"].split(",");
-          drawBoard(boardData);
-        });
-      }
+      data: { "move" : move }
     });
   }
 });
