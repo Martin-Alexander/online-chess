@@ -1,3 +1,6 @@
+var chessBoardFrame = "<%= j render "game/chess_board" %>";
+$("body").append($(chessBoardFrame));
+
 function numberToPiece(number){
   if (Number(number) > 0) {
     var piece = "w"
@@ -90,8 +93,6 @@ $.get("/new", function(data) {
   boardData = data["data"].split(",");
   drawBoard(boardData);
 });
-
-drawBoard(boardData)
 
 var locationSelected = false;
 

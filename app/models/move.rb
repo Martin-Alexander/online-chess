@@ -1,30 +1,44 @@
-class Move < Chess
+class Move
+
+  module ChessPieces
+    def piece
+      if !(self.is_a? Integer)
+        raise ArgumentError.new "arguement must be of type Integer"
+      elsif !((-6..-1).to_a + (0..6).to_a).include? self
+        raise ArgumentError.new "integer #{self} is out of range"
+      end
+
+      case self.abs
+        when 6 then "king"
+        when 5 then "queen"
+        when 4 then "rook"
+        when 3 then "bishop"
+        when 2 then "knight"
+        when 1 then "pawn"
+        when 0 then nil
+      end
+    end
+
+    def color
+      if self < 0
+        "black"
+      elsif self > 0
+        "white"
+      else
+        nil
+      end
+    end
+  end
+
+  Fixnum.send(:include, ChessPieces)
 
   attr_reader :start_square, :end_square, :promotion, :in_bounds
-
-  def initialize(start_square, end_square, promotion = false)
+  
+  def initialize(start_square, end_square, params ={})
     @start_square = start_square
-    if !@start_square.is_a? Array
-      raise ArgumentError.new "starting square must be of type Array"
-    elsif !valid_move_square(@start_square)
-      raise ArgumentError.new "invalid starting square"
-    end
-
     @end_square = end_square
-    if !@end_square.is_a? Array
-      raise ArgumentError.new "ending square must be of type Array"
-    elsif !valid_move_square(@end_square)
-      raise ArgumentError.new "invalid ending square"
-    end
-
-    @promotion = promotion
-    if !(@promotion.is_a? FalseClass) && !(@promotion.is_a? Integer)
-      raise ArgumentError.new "promotion must be of type Integer or FalseClass"
-    elsif !(@promotion.is_a? FalseClass) && !((2..5).include? @promotion)
-      raise ArgumentError.new "promotion must be between 2 and 5"
-    end
-
     @in_bounds = in_bounds?
+    @promotion = params[:promotion] || 0
   end
 
   def to_s
@@ -32,8 +46,8 @@ class Move < Chess
       "#{8 - @start_square[0] }" +
       " #{(@end_square[1] + 97).chr}" +
       "#{8 - @end_square[0]}"
-    if @promotion
-      move = move + " promote to #{piece(@promotion)}"
+    if !@promotion.zero?
+      move = move + " promote to #{@promotion.piece}"
     end
     return move
   end

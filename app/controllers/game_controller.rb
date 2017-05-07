@@ -13,9 +13,12 @@ class GameController < ApplicationController
     my_move = Move.new([move[0].to_i, move[1].to_i], [move[2].to_i, move[3].to_i])
     board = Board.last
     new_board = board.move(my_move)
-    new_board.save
+    if new_board
+      new_board.game = Game.last
+      new_board.save
+    end
   end
-
+  
   def new
     render :json => { data: Board.last.board_data }
   end

@@ -35,26 +35,36 @@ class Board < ApplicationRecord
 
   def move(move)
     setup
+    if move.is_a? String
+      move = Move.new([move[0].to_i, move[1].to_i], [move[2].to_i, move[3].to_i], promotion: move[4].to_i)
+    end
     legal = moves.any? do |legal_move|
       legal_move.start_square == move.start_square &&
       legal_move.end_square == move.end_square
     end
     if legal
-      new_board = execute_move(@board, move)
-      return new_board
-    else
-      return false
+      new_board_data = execute_move(@board_data, move)
+      new_board_data = new_board_data.flatten.map { |i| "#{i},"}.join
+      new_board_data[-1] = ""
+      new_castling = ""
+      @castling.each { |k, v| v ? new_castling << "1" : new_castling << "0" } 
+      new_board = Board.new(ply: @ply + 1, board_data: new_board_data, white_to_move: !@white_to_move, castling: new_castling, en_passant: @en_passant.dup)
+      new_board = castling_update(new_board, move)
     end
+    return new_board
   end
 
   def moves
     setup
     output = []
     each_square do |rank, file|
-      if right_color?(rank, file) && !naive_moves(rank, file, @board).nil?
-        naive_moves(rank, file, @board).each do |naive_move|
-          if king_safe?(naive_move)
-            output << naive_move
+      if right_color?(rank, file) 
+        naive_moves = naive_moves(rank, file, @board_data, @castling)
+        if !naive_moves.nil?
+          naive_moves.each do |naive_move|
+            if king_safe?(naive_move)
+              output << naive_move
+            end
           end
         end
       end
@@ -62,27 +72,23 @@ class Board < ApplicationRecord
     return output
   end
 
+  def board_visualization
+    setup
+    @board_data.each_with_index do |row, i|
+      row.each { |square| print square < 0 ? "#{square} " : " #{square} " }
+      puts
+    end
+  end
 
   private
-
-  def execute_move(board, move)
-    board_copy = board.map { |i| i.dup }
-    board_copy[move.end_square[0]][move.end_square[1]] = board_copy[move.start_square[0]][move.start_square[1]]
-    board_copy[move.start_square[0]][move.start_square[1]] = 0
-    output_board = ""
-    board_copy = board_copy.flatten
-    board_copy.each { |i| output_board << "#{i.to_s}," }
-    output_board[-1] = ""
-    Board.new(game_id: game_id, ply: @ply + 1, board_data: output_board, white_to_move: !@white_to_move, castling: "0000", en_passant: "0000")
-  end
 
   def setup
     @ply = ply
 
-    @board = []
+    @board_data = []
     board_data.split(",").each_with_index do |piece, i|
-      @board << [] if i % 8 == 0
-      @board[-1] << piece.to_i
+      @board_data << [] if i % 8 == 0
+      @board_data[-1] << piece.to_i
     end
 
     @white_to_move = white_to_move
@@ -98,14 +104,60 @@ class Board < ApplicationRecord
     @en_passant << [en_passant[2].to_i, en_passant[3].to_i]
   end
 
-  def naive_moves(rank, file, board)
+  def castling_update(board, move)
+    castling_data = board.castling
+    if move.start_square == [7, 4]
+      castling_data[0] = "0"
+      castling_data[1] = "0"
+    elsif move.start_square == [0, 4]
+      castling_data[2] = "0"
+      castling_data[3] = "0"
+    elsif move.start_square == [7, 7] || move.end_square == [7, 7]
+      castling_data[0] = "0"
+    elsif move.start_square == [7, 0] || move.end_square == [7, 0]
+      castling_data[1] = "0"
+    elsif move.start_square == [0, 0] || move.end_square == [0, 0]
+      castling_data[2] = "0"
+    elsif move.start_square == [0, 7] || move.end_square == [0, 7]
+      castling_data[3] = "0"
+    end
+    return board
+  end
+
+  def execute_move(board, move)
+    board_copy = board.map { |i| i.dup }
+    if board_copy[move.start_square[0]][move.start_square[1]] == "white"
+      promoted_piece = move.promotion
+    else 
+      promoted_piece = move.promotion * -1
+    end
+    piece_on_arrival = move.promotion.zero? ? board_copy[move.start_square[0]][move.start_square[1]] : promoted_piece
+    board_copy[move.end_square[0]][move.end_square[1]] = piece_on_arrival
+    board_copy[move.start_square[0]][move.start_square[1]] = 0
+    if move.start_square == [7, 4] && move.end_square == [7, 6]
+        board_copy[7][7] = 0
+        board_copy[7][5] = 4
+    elsif move.start_square == [7, 4] && move.end_square == [7, 2]
+        board_copy[7][0] = 0
+        board_copy[7][4] = 4
+    elsif move.start_square == [0, 4] && move.end_square == [0, 6]
+        board_copy[0][7] = 0
+        board_copy[0][5] = -4
+    elsif move.start_square == [0, 4] && move.end_square == [0, 2]
+        board_copy[0][0] = 0
+        board_copy[0][3] = -4
+    end
+    return board_copy
+  end
+
+  def naive_moves(rank, file, board, castling)
     case board[rank][file].abs
       when 1 then naive_pawn_moves(rank, file, board)
       when 2 then naive_knight_moves(rank, file, board)
       when 3 then naive_bishop_moves(rank, file, board)
       when 4 then naive_rook_moves(rank, file, board)
       when 5 then naive_queen_moves(rank, file, board)
-      when 6 then naive_king_moves(rank, file, board)
+      when 6 then naive_king_moves(rank, file, board, castling)
     end
   end
 
@@ -120,20 +172,17 @@ class Board < ApplicationRecord
         break
       end
     end
-    raise Error.new "missing king on board" if output.nil?
     return output
   end
 
   def right_color?(rank, file)
     right_color = @white_to_move ? "white" : "black"
-    @board[rank][file].color == right_color
+    @board_data[rank][file].color == right_color
   end
 
   def king_safe?(move)
     right_color = @white_to_move ? "black" : "white"
-    test_board = @board.map { |i| i.dup }
-    test_board[move.end_square[0]][move.end_square[1]] = test_board[move.start_square[0]][move.start_square[1]]
-    test_board[move.start_square[0]][move.start_square[1]] = 0
+    test_board = execute_move(@board_data, move)
     king_location = find_king(test_board)
     safety = true
     catch :king_safety do
@@ -144,7 +193,7 @@ class Board < ApplicationRecord
       each_square do |rank, file|
         if ["rook", "bishop", "queen"].include?(test_board[rank][file].piece) &&
           test_board[rank][file].color == right_color
-          naive_moves(rank, file, test_board).each do |enemy_move|
+          naive_moves(rank, file, test_board, {}).each do |enemy_move|
             if enemy_move.end_square == king_location
               safety = false
               throw :king_safety
@@ -182,7 +231,7 @@ class Board < ApplicationRecord
       ]
 
       knights.each do |i|
-        if i[0] >= 0 && i[1] >= 0 &&
+        if i[0] > 0 && i[1] > 0 &&
           board[i[0]] && board[i[0]][i[1]] &&
           board[i[0]][i[1]].piece == "knight" &&
           board[i[0]][i[1]].color != king_color
@@ -230,29 +279,41 @@ class Board < ApplicationRecord
     v_direction = piece > 0 ? -1 : 1
     if !board[rank + 1 * v_direction].nil? &&
       board[rank + 1 * v_direction][file].zero? &&
-      output << Move.new([rank, file], [rank + 1 * v_direction, file])
-      if !board[rank + 2 * v_direction].nil?
+      output << pawn_move_builder([rank, file], [rank + 1 * v_direction, file], piece)
+      if !board[rank + 2 * v_direction].nil? &&
         board[rank + 2 * v_direction][file].zero? &&
         ((rank == 1 && piece.color == "black") || (rank == 6 && piece.color == "white"))
-        output << Move.new([rank, file], [rank + 2 * v_direction, file])
+        output << pawn_move_builder([rank, file], [rank + 2 * v_direction, file], piece)
       end
     end
     if !board[rank + 1 * v_direction].nil? &&
       !board[rank + 1 * v_direction][file - 1].nil? &&
       !(board[rank + 1 * v_direction][file - 1]).zero? &&
       piece.color != board[rank + 1 * v_direction][file - 1].color
-      output << Move.new([rank, file], [rank + 1 * v_direction, file - 1])
+      output << pawn_move_builder([rank, file], [rank + 1 * v_direction, file - 1], piece)
     end
     if !board[rank + 1 * v_direction].nil? &&
       !board[rank + 1 * v_direction][file + 1].nil? &&
       !(board[rank + 1 * v_direction][file + 1]).zero? &&
       piece.color != board[rank + 1 * v_direction][file + 1].color
-      output << Move.new([rank, file], [rank + 1 * v_direction, file + 1])
+      output << pawn_move_builder([rank, file], [rank + 1 * v_direction, file + 1], piece)
     end
-    remove_out_of_bounds(output)
+    remove_out_of_bounds(output.flatten)
   end
 
-  def naive_king_moves(rank, file, board)
+  def pawn_move_builder(start_square, end_square, piece)
+    output = []
+    if piece.color == "white" && end_square[0] == 0
+      [2, 3, 4, 5].each { |i| output << Move.new(start_square, end_square, promotion: i) } 
+    elsif piece.color == "black" && end_square[0] == 7
+      [2, 3, 4, 5].each { |i| output << Move.new(start_square, end_square, promotion: i) }
+    else 
+      output << Move.new(start_square, end_square)
+    end
+    return output
+  end
+
+  def naive_king_moves(rank, file, board, castling)
     output = []
     piece = board[rank][file]
     [-1, 0, 1].each do |rank_inc|
@@ -262,6 +323,21 @@ class Board < ApplicationRecord
           !(piece.color == board[rank + rank_inc][file + file_inc].color)
           output << Move.new([rank, file], [rank + rank_inc, file + file_inc])
         end
+      end
+    end
+    if piece.color == "white"
+      if castling[:white_king] && board[7][5].zero? && board[7][6].zero?
+        output << Move.new([rank, file], [7, 6])
+      end
+      if castling[:white_queen] && board[7][3].zero? && board[7][2].zero? && board[7][1].zero?
+        output << Move.new([rank, file], [7, 2])
+      end
+    else
+      if castling[:black_king] && board[0][5].zero? && board[0][6].zero?
+        output << Move.new([rank, file], [0, 6])
+      end
+      if castling[:black_queen] && board[0][3].zero? && board[0][2].zero? && board[0][1].zero?
+        output << Move.new([rank, file], [0, 2])
       end
     end
     remove_out_of_bounds(output)
@@ -307,6 +383,7 @@ class Board < ApplicationRecord
     return output.flatten
   end
 
+
   def move_along (rank_mod, file_mod, sequence_builder, rank, file, output, board)
     piece = board[rank][file]
     (1..sequence_builder).each do |increment|
@@ -332,15 +409,5 @@ class Board < ApplicationRecord
 
   def remove_out_of_bounds(output)
     output.select { |i| i.in_bounds }
-  end
-
-  def board_visualization(chess_board)
-    if !chess_board.is_a? ChessBoard
-      raise ArgumentError.new "board_visualization must be passed arguement of type ChessBoard"
-    end
-    chess_board.board.each_with_index do |row, i|
-      row.each { |square| print square < 0 ? "#{square} " : " #{square} " }
-      puts
-    end
   end
 end
