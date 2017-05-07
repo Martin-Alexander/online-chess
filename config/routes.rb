@@ -9,4 +9,6 @@ Rails.application.routes.draw do
 
   get "new", to: "game#new", as: "new"
 
+  mount ActionCable.server, at: '/cable'
+
 end
