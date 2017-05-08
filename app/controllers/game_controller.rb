@@ -1,11 +1,10 @@
 class GameController < ApplicationController
-
+  
   def board
   end
 
-  def game
-    @legal_moves = Board.last.moves.map { |move| move.to_s}
-    @board_data = Board.last.board_data
+  def game_data
+    render json: { data: Board.last.board_data}
   end
 
   def move
@@ -19,9 +18,4 @@ class GameController < ApplicationController
       ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data }
     end
   end
-  
-  def new
-    render :json => { data: Board.last.board_data }
-  end
-
 end

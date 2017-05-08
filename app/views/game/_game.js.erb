@@ -1,6 +1,3 @@
-var chessBoardFrame = "<%= j render "game/chess_board" %>";
-$("body").append($(chessBoardFrame));
-
 function numberToPiece(number){
   if (Number(number) > 0) {
     var piece = "w"
@@ -84,8 +81,9 @@ $("td").click(function(){
   }
 });
 
-$.get("/new", function(data) {
+$.get("/game_data", function(data) {
   boardData = data["data"].split(",");
+  console.log(boardData);
   drawBoard(boardData);
 });
 

@@ -1,13 +1,9 @@
 Rails.application.routes.draw do
   devise_for :users
 
-  root to: "game#board", as: "board"
-
-  post "game", to: "game#game", as: "game"
-
+  root to: "game#board"
+  get "game_data", to: "game#game_data"
   post "move", to: "game#move", as: "move"
-
-  get "new", to: "game#new", as: "new"
 
   mount ActionCable.server, at: '/cable'
 
