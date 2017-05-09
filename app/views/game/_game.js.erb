@@ -1,92 +1,105 @@
-function numberToPiece(number){
-  if (Number(number) > 0) {
-    var piece = "w"
-  } else if (Number(number) < 0) {
-    var piece = "b"
+var pieceClasses = ["wp", "wn", "wb", "wr", "wq", "wk", "bp", "bn", "bb", "br", "bq", "bk"];
+var whitePieceClasses = ["wp", "wn", "wb", "wr", "wq", "wk"];
+var blackPieceClasses = ["bp", "bn", "bb", "br", "bq", "bk"];
+var pieceConversionLookUp = {
+  "1" : "wp",
+  "2" : "wn",
+  "3" : "wb",
+  "4" : "wr",
+  "5" : "wq",
+  "6" : "wk",
+  "-1" : "bp",
+  "-2" : "bn",
+  "-3" : "bb",
+  "-4" : "br",
+  "-5" : "bq",
+  "-6" : "bk",
+  "0" : ""
+}
+
+function isSquareSelected($square) {
+  if ($square.hasClass("white-square-highlight") || $square.hasClass("black-square-highlight")) {
+    return true;
   } else {
-    return "";
+    return false;
   }
-  switch(number.substr(-1)){
-    case "1":
-      piece += "p";
-      break
-    case "2":
-      piece += "n";
-      break
-    case "3":
-      piece += "b";
-      break
-    case "4":
-      piece += "r";
-      break
-    case "5":
-      piece += "q";
-      break
-    case "6":
-      piece += "k";
-      break
-  }
-  return piece;
 }
 
 function drawBoard(boardData) {
   var counter = 0;
-  $("td").removeClass("wp wn wb wr wq wk bp bn bb br bq bk piece-here");
-  console.log(boardData);
-  $("tr").each(function(){
-    $(this).find("td").each(function(){
-      $(this).addClass(numberToPiece(boardData[counter]));
-      if ($(this).hasClass(numberToPiece(boardData[counter]))) {
-        $(this).addClass("piece-here");
-      }
-      counter = counter + 1;
+  $("td").removeClass(pieceClasses.join(" "));
+  $("td").removeClass("white-square-highlight black-square-highlight");
+  $("tr").each(function() {
+    $(this).find("td").each(function() {
+      $(this).addClass(pieceConversionLookUp[boardData[counter]]);
+      counter += 1;
     });
   });
 }
 
-function originSelect($square){
-  if ($square.hasClass("white")) {
-    var color = "white";
+function squareSelectHighlight($square) {
+  var color = $square.hasClass("white") ? "white" : "black";
+  if (isSquareSelected($square)) {
+    $("td").removeClass("white-square-highlight black-square-highlight");
   } else {
-    var color = "black";
-  }
-  if ($square.hasClass("origin-select-" + color)) {
-    $square.removeClass("origin-select-" + color);
-    pieceSelected = false;
-  } else {
-    $("td").removeClass("origin-select-white");
-    $("td").removeClass("origin-select-black");
-    $square.addClass("origin-select-" + color);
-    pieceSelected = $square.attr("id");
+    $("td").removeClass("white-square-highlight black-square-highlight");
+    $square.addClass(color + "-square-highlight");
   }
 }
 
-function destinationSelect($square) {
-  locationSelected = $square.attr("id");
-  $("td").removeClass("origin-select-white");
-  $("td").removeClass("origin-select-black");
-  return pieceSelected + locationSelected;
+function isTurnPlayersPiece($square) {
+  if (
+    (white_to_move && whitePieceClasses.includes($square.attr("class").split(" ")[1])) || 
+    (!white_to_move && blackPieceClasses.includes($square.attr("class").split(" ")[1]))
+  ) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
-$("td").click(function(){
-  if ($(this).hasClass("piece-here")) {
-    originSelect($(this));
-  } else if (pieceSelected) {
-    var move = destinationSelect($(this));
-    $.ajax({
-      type: "POST",
-      url: "/move",
-      data: { "move" : move }
-    });
-  }
-});
+function isAnyPieceSelected() {
+  var result = false;
+  $("td").each(function() {
+    if (isSquareSelected($(this))) {
+      result = true;
+    }
+  });
+  return result;
+}
 
-$.get("/game_data", function(data) {
-  boardData = data["data"].split(",");
-  console.log(boardData);
-  drawBoard(boardData);
-});
+var boardData;
+var white_to_move;
 
-var locationSelected = false;
-
-var pieceSelected = false;
+$(document).ready(function(){
+  $.get("/game_data", function(data) {
+    boardData = data["board_data"].split(",");
+    white_to_move = data["white_to_move"];
+    drawBoard(boardData);
+  });
+  var selectedPiece;
+  $("td").click(function(){
+    var $square = $(this);
+    if (isTurnPlayersPiece($square)) {
+      squareSelectHighlight($square);
+      selectedPiece = $square.attr("id");
+    } else if (isAnyPieceSelected()) {
+      // You have a piece selected and you're clicking on a square that does
+      // not contain a piece of yours. The assumption is that you want to 
+      // move your selected piece to this square
+      var move = selectedPiece + $square.attr("id");
+      $.ajax({
+        type: "POST",
+        url: "/move",
+        data: { "move" : move },
+        success: function() {
+          $.get("/game_data", function(data) {
+            boardData = data["board_data"].split(",");
+            white_to_move = data["white_to_move"];
+            drawBoard(boardData);
+          });
+        }
+      });
+    }
+  });
+})
