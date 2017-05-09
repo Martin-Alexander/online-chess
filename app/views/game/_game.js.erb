@@ -86,9 +86,6 @@ $(document).ready(function(){
       squareSelectHighlight($square);
       selectedPiece = $square.attr("id");
     } else if (isAnyPieceSelected()) {
-      // You have a piece selected and you're clicking on a square that does
-      // not contain a piece of yours. The assumption is that you want to 
-      // move your selected piece to this square
       var move = selectedPiece + $square.attr("id");
       $.ajax({
         type: "POST",
