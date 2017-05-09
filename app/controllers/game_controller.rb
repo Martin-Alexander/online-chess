@@ -16,11 +16,15 @@ class GameController < ApplicationController
     move = params[:move]
     my_move = Move.new([move[0].to_i, move[1].to_i], [move[2].to_i, move[3].to_i])
     board = Board.last
-    new_board = board.move(my_move)
-    if new_board
-      new_board.game = Game.last
-      new_board.save
-      ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data, white_to_move: new_board.white_to_move }
+    if (board.white_to_move && board.game.white.user == current_user) || (!board.white_to_move && board.game.black.user == current_user)
+      new_board = board.move(my_move)
+      if new_board
+        new_board.game = Game.last
+        new_board.save
+        ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data, white_to_move: new_board.white_to_move }
+      end
+    else
+      @not_your_turn = true
     end
   end
 
