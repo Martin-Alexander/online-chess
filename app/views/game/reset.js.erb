@@ -1,0 +1,5 @@
+$.get("/data", function(data) {
+boardData = data["board_data"].split(",");
+white_to_move = data["white_to_move"];
+drawBoard(boardData);
+});

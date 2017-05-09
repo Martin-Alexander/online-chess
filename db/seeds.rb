@@ -28,15 +28,7 @@ castling_board = [
   [4, 2, 3, 5, 6, 0, 0, 4]
 ]
 
-board = castling_board
-
-test_board = ""
-
-board = board.flatten
-
-board.each { |i| test_board << "#{i.to_s}," }
-
-test_board[-1] = ""
+test_board = castling_board.flatten.join(",")
 
 Board.create(
   game_id: 1,

@@ -3,7 +3,7 @@ class GameController < ApplicationController
   def board
   end
 
-  def game_data
+  def data
     render json: {
       board_data: Board.last.board_data, 
       white_to_move: Board.last.white_to_move,
@@ -22,5 +22,18 @@ class GameController < ApplicationController
       new_board.save
       ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data }
     end
+  end
+
+  def reset
+    first_board_data = Board.first.board_data
+    Board.destroy_all
+    Board.create(
+      game_id: 1,
+      ply: 1,
+      board_data: first_board_data,
+      white_to_move: true,
+      castling: "1111",
+      en_passant: "0000"
+    )
   end
 end

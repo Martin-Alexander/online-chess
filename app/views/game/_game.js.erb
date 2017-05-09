@@ -74,7 +74,7 @@ var moves;
 var castling;
 
 $(document).ready(function(){
-  $.get("/game_data", function(data) {
+  $.get("/data", function(data) {
     boardData = data["board_data"].split(",");
     white_to_move = data["white_to_move"];
     drawBoard(boardData);
@@ -92,7 +92,7 @@ $(document).ready(function(){
         url: "/move",
         data: { "move" : move },
         success: function() {
-          $.get("/game_data", function(data) {
+          $.get("/data", function(data) {
             boardData = data["board_data"].split(",");
             white_to_move = data["white_to_move"];
             moves = data["moves"];
