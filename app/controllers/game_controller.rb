@@ -6,7 +6,9 @@ class GameController < ApplicationController
   def game_data
     render json: {
       board_data: Board.last.board_data, 
-      white_to_move: Board.last.white_to_move
+      white_to_move: Board.last.white_to_move,
+      moves: Board.last.moves.map { |move| move.to_s },
+      castling: Board.last.castling
     }
   end
 

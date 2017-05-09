@@ -70,6 +70,8 @@ function isAnyPieceSelected() {
 
 var boardData;
 var white_to_move;
+var moves;
+var castling;
 
 $(document).ready(function(){
   $.get("/game_data", function(data) {
@@ -96,7 +98,12 @@ $(document).ready(function(){
           $.get("/game_data", function(data) {
             boardData = data["board_data"].split(",");
             white_to_move = data["white_to_move"];
+            moves = data["moves"];
+            castling = data["castling"]
             drawBoard(boardData);
+            console.log("player turn: " + (white_to_move ? "white" : "black"));
+            console.log("moves: " + moves.join(", "));
+            console.log("castling: " + castling);
           });
         }
       });
