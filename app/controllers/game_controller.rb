@@ -20,7 +20,7 @@ class GameController < ApplicationController
     if new_board
       new_board.game = Game.last
       new_board.save
-      ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data }
+      ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data, white_to_move: new_board.white_to_move }
     end
   end
 
