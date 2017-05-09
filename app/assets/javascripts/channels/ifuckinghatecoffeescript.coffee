@@ -7,3 +7,4 @@ App.game = App.cable.subscriptions.create "GameChannel",
 
   received: (data) ->
   	drawBoard data.board_data.split ","
+  	data.white_to_move
