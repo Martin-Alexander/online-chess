@@ -16,7 +16,7 @@ class GameController < ApplicationController
     move = params[:move]
     my_move = Move.new([move[0].to_i, move[1].to_i], [move[2].to_i, move[3].to_i])
     board = Board.last
-    if (board.white_to_move && board.game.white.user == current_user) || (!board.white_to_move && board.game.black.user == current_user)
+    if (board.white_to_move && board.game.white.user == current_user) || !board.white_to_move
       new_board = board.move(my_move)
       if new_board
         new_board.game = Game.last
