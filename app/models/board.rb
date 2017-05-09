@@ -92,12 +92,11 @@ class Board < ApplicationRecord
     end
 
     @white_to_move = white_to_move
-
     @castling = {}
-    @castling[:white_king] = castling[0] == 1
-    @castling[:white_queen] = castling[1] == 1
-    @castling[:black_king] = castling[2] == 1
-    @castling[:black_queen] = castling[3] == 1
+    @castling[:white_king] = castling[0] == "1"
+    @castling[:white_queen] = castling[1] == "1"
+    @castling[:black_king] = castling[2] == "1"
+    @castling[:black_queen] = castling[3] == "1"
 
     @en_passant = []
     @en_passant << [en_passant[0].to_i, en_passant[1].to_i]
