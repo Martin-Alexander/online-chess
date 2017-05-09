@@ -4,7 +4,10 @@ class GameController < ApplicationController
   end
 
   def game_data
-    render json: { data: Board.last.board_data}
+    render json: {
+      board_data: Board.last.board_data, 
+      white_to_move: Board.last.white_to_move
+    }
   end
 
   def move
