@@ -242,22 +242,22 @@ class Board < ApplicationRecord
     return threat
   end
 
-  def valid_pieces(pieces_array)
-    pieces_array.length == 8 && pieces_array.all? { |i| i.length == 8 }
-  end
+  # def valid_pieces(pieces_array)
+  #   pieces_array.length == 8 && pieces_array.all? { |i| i.length == 8 }
+  # end
 
-  def valid_castling_hash(castling_hash)
-    castling_hash.length == 4 &&
-    !!castling_hash[:white_king] == castling_hash[:white_king] &&
-    !!castling_hash[:white_queen] == castling_hash[:white_queen] &&
-    !!castling_hash[:black_king] == castling_hash[:black_king] &&
-    !!castling_hash[:black_queen] == castling_hash[:black_queen]
-  end
+  # def valid_castling_hash(castling_hash)
+  #   castling_hash.length == 4 &&
+  #   !!castling_hash[:white_king] == castling_hash[:white_king] &&
+  #   !!castling_hash[:white_queen] == castling_hash[:white_queen] &&
+  #   !!castling_hash[:black_king] == castling_hash[:black_king] &&
+  #   !!castling_hash[:black_queen] == castling_hash[:black_queen]
+  # end
 
-  def valid_en_passant(en_passant_array)
-    en_passant_array.length == 2 && en_passant_array.all? { |i| i.length == 2}
-    # TODO: Make more robust en passant validation using game logic
-  end
+  # def valid_en_passant(en_passant_array)
+  #   en_passant_array.length == 2 && en_passant_array.all? { |i| i.length == 2}
+  #   # TODO: Make more robust en passant validation using game logic
+  # end
 
   def standard_board_setup
     [
