@@ -2,7 +2,6 @@ class Board < ApplicationRecord
   belongs_to :game
 
   def move(move)
-    setup
     if move.is_a? String
       move = Move.new([move[0].to_i, move[1].to_i], [move[2].to_i, move[3].to_i], promotion: move[4].to_i)
     end
@@ -11,23 +10,17 @@ class Board < ApplicationRecord
       legal_move.end_square == move.end_square
     end
     if legal
-      new_board_data = execute_move(@board_data, move)
-      new_board_data = new_board_data.flatten.map { |i| "#{i},"}.join
-      new_board_data[-1] = ""
-      new_castling = ""
-      @castling.each { |k, v| v ? new_castling << "1" : new_castling << "0" } 
-      new_board = Board.new(ply: @ply + 1, board_data: new_board_data, white_to_move: !@white_to_move, castling: new_castling, en_passant: @en_passant.dup)
-      new_board = castling_update(new_board, move)
+      new_board_data = execute_move(board_data.to_board, move).serialize_board
+      new_board = Board.new(ply: ply + 1, board_data: new_board_data, white_to_move: !white_to_move, castling: castling_update(move), en_passant: en_passant)
     end
     return new_board
   end
 
   def moves
-    setup
     output = []
     each_square do |rank, file|
       if right_color?(rank, file) 
-        naive_moves = naive_moves(rank, file, @board_data, @castling)
+        naive_moves = naive_moves(rank, file, board_data.to_board)
         if !naive_moves.nil?
           naive_moves.each do |naive_move|
             if king_safe?(naive_move)
@@ -41,8 +34,7 @@ class Board < ApplicationRecord
   end
 
   def board_visualization
-    setup
-    @board_data.each_with_index do |row, i|
+    board_data.to_board.each do |row|
       row.each { |square| print square < 0 ? "#{square} " : " #{square} " }
       puts
     end
@@ -50,45 +42,24 @@ class Board < ApplicationRecord
 
   private
 
-  def setup
-    @ply = ply
-
-    @board_data = []
-    board_data.split(",").each_with_index do |piece, i|
-      @board_data << [] if i % 8 == 0
-      @board_data[-1] << piece.to_i
-    end
-
-    @white_to_move = white_to_move
-    @castling = {}
-    @castling[:white_king] = castling[0] == "1"
-    @castling[:white_queen] = castling[1] == "1"
-    @castling[:black_king] = castling[2] == "1"
-    @castling[:black_queen] = castling[3] == "1"
-
-    @en_passant = []
-    @en_passant << [en_passant[0].to_i, en_passant[1].to_i]
-    @en_passant << [en_passant[2].to_i, en_passant[3].to_i]
-  end
-
-  def castling_update(board, move)
-    castling_data = board.castling
+  def castling_update(move)
+    new_castling = castling
     if move.start_square == [7, 4]
-      castling_data[0] = "0"
-      castling_data[1] = "0"
+      new_castling[0] = "0"
+      new_castling[1] = "0"
     elsif move.start_square == [0, 4]
-      castling_data[2] = "0"
-      castling_data[3] = "0"
+      new_castling[2] = "0"
+      new_castling[3] = "0"
     elsif move.start_square == [7, 7] || move.end_square == [7, 7]
-      castling_data[0] = "0"
+      new_castling[0] = "0"
     elsif move.start_square == [7, 0] || move.end_square == [7, 0]
-      castling_data[1] = "0"
+      new_castling[1] = "0"
     elsif move.start_square == [0, 0] || move.end_square == [0, 0]
-      castling_data[2] = "0"
+      new_castling[2] = "0"
     elsif move.start_square == [0, 7] || move.end_square == [0, 7]
-      castling_data[3] = "0"
+      new_castling[3] = "0"
     end
-    return board
+    return new_castling
   end
 
   def execute_move(board, move)
@@ -117,25 +88,25 @@ class Board < ApplicationRecord
     return board_copy
   end
 
-  def naive_moves(rank, file, board, castling)
+  def naive_moves(rank, file, board)
     case board[rank][file].abs
       when 1 then naive_pawn_moves(rank, file, board)
       when 2 then naive_knight_moves(rank, file, board)
       when 3 then naive_bishop_moves(rank, file, board)
       when 4 then naive_rook_moves(rank, file, board)
       when 5 then naive_queen_moves(rank, file, board)
-      when 6 then naive_king_moves(rank, file, board, castling)
+      when 6 then naive_king_moves(rank, file, board)
     end
   end
 
-  def find_king(board)
-    right_color = @white_to_move ? "white" : "black"
+  def find_king(test_board)
+    right_color = white_to_move ? "white" : "black"
     output = nil
     each_square do |rank, file|
-      if !board[rank][file].zero? &&
-        board[rank][file].piece == "king" &&
-        board[rank][file].color == right_color
-        output = [rank, file]
+      if !test_board[rank][file].zero? &&
+        test_board[rank][file].piece == "king" &&
+        test_board[rank][file].color == right_color
+        test_board = [rank, file]
         break
       end
     end
@@ -143,13 +114,13 @@ class Board < ApplicationRecord
   end
 
   def right_color?(rank, file)
-    right_color = @white_to_move ? "white" : "black"
-    @board_data[rank][file].color == right_color
+    right_color = white_to_move ? "white" : "black"
+    board_data.to_board[rank][file].color == right_color
   end
 
   def king_safe?(move)
-    right_color = @white_to_move ? "black" : "white"
-    test_board = execute_move(@board_data, move)
+    right_color = white_to_move ? "black" : "white"
+    test_board = execute_move(board_data.to_board, move)
     king_location = find_king(test_board)
     safety = true
     catch :king_safety do
@@ -160,7 +131,7 @@ class Board < ApplicationRecord
       each_square do |rank, file|
         if ["rook", "bishop", "queen"].include?(test_board[rank][file].piece) &&
           test_board[rank][file].color == right_color
-          naive_moves(rank, file, test_board, {}).each do |enemy_move|
+          naive_moves(rank, file, test_board).each do |enemy_move|
             if enemy_move.end_square == king_location
               safety = false
               throw :king_safety
@@ -172,10 +143,10 @@ class Board < ApplicationRecord
     return safety
   end
 
-  def local_threats_to_king?(board, rank, file)
+  def local_threats_to_king?(test_board, rank, file)
     threat = false
     catch :king_safety do
-      if @white_to_move
+      if white_to_move
         king_color = "white"
         pawns = [[rank - 1, file - 1], [rank - 1, file + 1]]
       else
@@ -184,9 +155,9 @@ class Board < ApplicationRecord
       end
 
       pawns.each do |i|
-        if board[i[0]] && board[i[0]][i[1]] &&
-          board[i[0]][i[1]].piece == "pawn" &&
-          board[i[0]][i[1]].color != king_color
+        if test_board[i[0]] && test_board[i[0]][i[1]] &&
+          test_board[i[0]][i[1]].piece == "pawn" &&
+          test_board[i[0]][i[1]].color != king_color
           threat = true
           throw :king_safety
         end
@@ -199,45 +170,15 @@ class Board < ApplicationRecord
 
       knights.each do |i|
         if i[0] > 0 && i[1] > 0 &&
-          board[i[0]] && board[i[0]][i[1]] &&
-          board[i[0]][i[1]].piece == "knight" &&
-          board[i[0]][i[1]].color != king_color
+          test_board[i[0]] && test_board[i[0]][i[1]] &&
+          test_board[i[0]][i[1]].piece == "knight" &&
+          test_board[i[0]][i[1]].color != king_color
           threat = true
           throw :king_safety
         end
       end
     end
     return threat
-  end
-
-  # def valid_pieces(pieces_array)
-  #   pieces_array.length == 8 && pieces_array.all? { |i| i.length == 8 }
-  # end
-
-  # def valid_castling_hash(castling_hash)
-  #   castling_hash.length == 4 &&
-  #   !!castling_hash[:white_king] == castling_hash[:white_king] &&
-  #   !!castling_hash[:white_queen] == castling_hash[:white_queen] &&
-  #   !!castling_hash[:black_king] == castling_hash[:black_king] &&
-  #   !!castling_hash[:black_queen] == castling_hash[:black_queen]
-  # end
-
-  # def valid_en_passant(en_passant_array)
-  #   en_passant_array.length == 2 && en_passant_array.all? { |i| i.length == 2}
-  #   # TODO: Make more robust en passant validation using game logic
-  # end
-
-  def standard_board_setup
-    [
-      [-4, -2, -3, -5, -6, -3, -2, -4],
-      [-1, -1, -1, -1, -1, -1, -1, -1],
-      [0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0],
-      [1, 1, 1, 1, 1, 1, 1, 1],
-      [4, 2, 3, 5, 6, 3, 2, 4]
-    ]
   end
 
   def naive_pawn_moves(rank, file, board)
@@ -280,7 +221,7 @@ class Board < ApplicationRecord
     return output
   end
 
-  def naive_king_moves(rank, file, board, castling)
+  def naive_king_moves(rank, file, board)
     output = []
     piece = board[rank][file]
     [-1, 0, 1].each do |rank_inc|
@@ -293,17 +234,17 @@ class Board < ApplicationRecord
       end
     end
     if piece.color == "white"
-      if castling[:white_king] && board[7][5].zero? && board[7][6].zero?
+      if castling[0].to_i == 1 && board[7][5].zero? && board[7][6].zero?
         output << Move.new([rank, file], [7, 6])
       end
-      if castling[:white_queen] && board[7][3].zero? && board[7][2].zero? && board[7][1].zero?
+      if castling[1].to_i == 1 && board[7][3].zero? && board[7][2].zero? && board[7][1].zero?
         output << Move.new([rank, file], [7, 2])
       end
     else
-      if castling[:black_king] && board[0][5].zero? && board[0][6].zero?
+      if castling[2].to_i == 1 && board[0][5].zero? && board[0][6].zero?
         output << Move.new([rank, file], [0, 6])
       end
-      if castling[:black_queen] && board[0][3].zero? && board[0][2].zero? && board[0][1].zero?
+      if castling[3].to_i == 1 && board[0][3].zero? && board[0][2].zero? && board[0][1].zero?
         output << Move.new([rank, file], [0, 2])
       end
     end
