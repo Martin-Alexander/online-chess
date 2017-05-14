@@ -90,15 +90,15 @@ $(document).ready(function(){
       $.ajax({
         type: "POST",
         url: "/move",
-        data: { "move" : move },
+        data: {
+          "move" : move,
+          "gameId" : "<%= @game_id %>"
+        },
         success: function() {
           $.get("/data", function(data) {
             white_to_move = data["white_to_move"];
             moves = data["moves"];
             castling = data["castling"]
-            console.log("player turn: " + (white_to_move ? "white" : "black"));
-            console.log("moves: " + moves.join(", "));
-            console.log("castling: " + castling);
           });
         }
       });
