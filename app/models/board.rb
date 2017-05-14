@@ -77,7 +77,7 @@ class Board < ApplicationRecord
         board_copy[7][5] = 4
     elsif move.start_square == [7, 4] && move.end_square == [7, 2]
         board_copy[7][0] = 0
-        board_copy[7][4] = 4
+        board_copy[7][3] = 4
     elsif move.start_square == [0, 4] && move.end_square == [0, 6]
         board_copy[0][7] = 0
         board_copy[0][5] = -4
