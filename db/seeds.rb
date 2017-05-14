@@ -28,7 +28,7 @@ castling_board = [
   [4, 2, 3, 5, 6, 0, 0, 4]
 ]
 
-std_board = castling_board.flatten.join(",")
+test_board = std_board.flatten.join(",")
 
 Board.create(
   game_id: 1,
