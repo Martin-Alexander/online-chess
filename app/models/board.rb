@@ -106,7 +106,7 @@ class Board < ApplicationRecord
       if !test_board[rank][file].zero? &&
         test_board[rank][file].piece == "king" &&
         test_board[rank][file].color == right_color
-        test_board = [rank, file]
+        output = [rank, file]
         break
       end
     end
