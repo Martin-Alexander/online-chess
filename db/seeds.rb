@@ -6,17 +6,6 @@ Player.create(user_id: 2, color: "black")
 
 Game.create( white_id: 1, black_id: 2)
 
-std_board = [
-  [-4, -2, -3, -5, -6, -3, -2, -4],
-  [-1, -1, -1, -1, -1, -1, -1, -1],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [1, 1, 1, 1, 1, 1, 1, 1],
-  [4, 2, 3, 5, 6, 3, 2, 4]
-]
-
 castling_board = [
   [-4, -2, -3, -5, -6, 0, -2, -4],
   [-1, -1, -1, -1, 0, 0, -1, -1],
@@ -28,13 +17,6 @@ castling_board = [
   [4, 2, 3, 5, 6, 0, 0, 4]
 ]
 
-test_board = std_board.flatten.join(",")
+test_board = castling_board.flatten.join(",")
 
-Board.create(
-  game_id: 1,
-  ply: 1,
-  board_data: test_board,
-  white_to_move: true,
-  castling: "1111",
-  en_passant: "0000"
-)
+Board.create(game_id: 1)

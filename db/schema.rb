@@ -17,11 +17,11 @@ ActiveRecord::Schema.define(version: 20170503210912) do
 
   create_table "boards", force: :cascade do |t|
     t.bigint "game_id"
-    t.integer "ply"
-    t.string "board_data"
-    t.boolean "white_to_move"
-    t.string "castling"
-    t.string "en_passant"
+    t.integer "ply", default: 1
+    t.boolean "white_to_move", default: true
+    t.string "board_data", default: "-4,-2,-3,-5,-6,-3,-2,-4,-1,-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,4,2,3,5,6,3,2,4"
+    t.string "castling", default: "1111"
+    t.string "en_passant", default: "1111"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["game_id"], name: "index_boards_on_game_id"
