@@ -1,9 +1,6 @@
 User.create(email: "martingianna@gmail.com", password: "123456")
 User.create(email: "player_two@gmail.com", password: "123456")
 
-Player.create(user_id: 1, color: "white")
-Player.create(user_id: 2, color: "black")
-
 Game.create( white_id: 1, black_id: 2)
 
 castling_board = [
