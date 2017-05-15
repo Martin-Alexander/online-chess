@@ -1,4 +1,13 @@
-<%= link_to "New Game", new_path %>
+<div>
+  <% if current_user %>
+  	Signed in with: <strong><%= current_user.email %></strong>
+    <%= link_to "Sign out", destroy_user_session_path, method: :delete %>
+    <div><%= link_to "Create New Game", new_path %></div>
+  <% else %>
+    <%= link_to "Sign in", new_user_session_path %>
+    <%= link_to "Sign up", new_user_registration_path %>
+  <% end %>
+</div>
 
 <% @all_games.each do |game| %>
 	<div>
