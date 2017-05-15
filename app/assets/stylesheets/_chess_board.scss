@@ -1,18 +1,19 @@
 table {
-  border-collapse:collapse
+  border-collapse: collapse;
+  margin: 0px auto;
+  max-height: 768px;
+  max-width: 768px;
+  width: calc(100vmin - 36px);
+  height: calc(100vmin - 36px);
 }
 
 .board-container {
-  margin: 50px auto;
-  width: 768px;
-  height: 768px;
 }
 
 #chess-board {
   tr {
     td {
-      width: 96px;
-      height: 96px;
+      background-size: contain;
     }
   }
 }
