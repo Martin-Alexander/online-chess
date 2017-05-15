@@ -5,9 +5,30 @@ class GameController < ApplicationController
   end
 
   def new
+    if !current_user.nil?
+      @all_other_players = User.where.not(email: current_user.email)
+    else
+      redirect_to home_path
+    end
   end
 
   def create
+    white_to_move = params["white_to_move"]
+    board_data = params["board_data"]
+    player_two = params["player_two"]
+    player_one_color = params["player_one_color"]
+
+    game = if player_one_color == "white"
+      Game.create(white: current_user, black_id: player_two)
+    else
+      Game.create(white_id: player_two, black: current_user)
+    end
+    if board_data.empty? 
+      Board.create!(game: game)
+    else
+      Board.create!(game: game, white_to_move: white_to_move, board_data: board_data)
+    end
+    redirect_to show_path(game.id)
   end
 
   def show
@@ -15,11 +36,12 @@ class GameController < ApplicationController
   end
 
   def data
+    board = Game.find(params[:game_id]).boards.last
     render json: {
-      board_data: Board.last.board_data, 
-      white_to_move: Board.last.white_to_move,
-      moves: Board.last.moves.map { |move| move.to_s },
-      castling: Board.last.castling
+      board_data: board.board_data, 
+      white_to_move: board.white_to_move,
+      moves: board.moves.map { |move| move.to_s },
+      castling: board.castling
     }
   end
 
@@ -31,7 +53,7 @@ class GameController < ApplicationController
     if new_board
       new_board.game = Game.find(params[:gameId])
       new_board.save
-      ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data, white_to_move: new_board.white_to_move }
+      ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data, white_to_move: new_board.white_to_move, game_id: params["gameId"].to_s }
     end
   end
 
