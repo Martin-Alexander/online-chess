@@ -1,1 +1,7 @@
-hom
+<%= link_to "New Game", new_path %>
+
+<% @all_games.each do |game| %>
+	<div>
+		<%= link_to "View Game #{game.id}", show_path(game) %>
+	</div>
+<% end %>
