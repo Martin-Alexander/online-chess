@@ -72,13 +72,18 @@ var boardData;
 var white_to_move;
 var moves;
 var castling;
+var gameId = "<%= @game_id %>";
 
-$(document).ready(function(){
-  $.get("/data", function(data) {
+function getBoardData() {
+  $.get("/data/" + gameId, function(data) {
     boardData = data["board_data"].split(",");
     white_to_move = data["white_to_move"];
     drawBoard(boardData);
   });
+}
+
+$(document).ready(function(){
+  getBoardData();
   var selectedPiece;
   $("td").click(function(){
     var $square = $(this);
@@ -92,14 +97,10 @@ $(document).ready(function(){
         url: "/move",
         data: {
           "move" : move,
-          "gameId" : "<%= @game_id %>"
+          "gameId" : gameId
         },
         success: function() {
-          $.get("/data", function(data) {
-            white_to_move = data["white_to_move"];
-            moves = data["moves"];
-            castling = data["castling"]
-          });
+          getBoardData();
         }
       });
     }

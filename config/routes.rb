@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   post "create", to: "game#create", as: "create"
 
   get "game/:game_id", to: "game#show", as: "show"
-  get "data", to: "game#data", as: "data"
+  get "data/:game_id", to: "game#data", as: "data"
   
   post "move", to: "game#move", as: "move"
   
