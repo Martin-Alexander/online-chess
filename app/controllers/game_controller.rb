@@ -6,7 +6,8 @@ class GameController < ApplicationController
 
   def new
     if !current_user.nil?
-      @all_other_players = User.where.not(email: current_user.email)
+      # @all_other_players = User.where.not(email: current_user.email)
+      @all_other_players = User.all
     else
       redirect_to home_path
     end
@@ -51,7 +52,7 @@ class GameController < ApplicationController
 
   def move
     move = params[:move]
-    my_move = Move.new([move[0].to_i, move[1].to_i], [move[2].to_i, move[3].to_i])
+    my_move = Move.new([move[0].to_i, move[1].to_i], [move[2].to_i, move[3].to_i], promotion: move.length == 5 ? move[4].to_i : 0 )
     board = Game.find(params[:gameId]).boards.last
     new_board = board.move(my_move)
     if (board.white_to_move && board.game.white == current_user) || (!board.white_to_move && board.game.black == current_user)
@@ -63,18 +64,5 @@ class GameController < ApplicationController
     else
       @not_your_turn = true
     end
-  end
-
-  def reset
-    first_board_data = Board.first.board_data
-    Board.destroy_all
-    Board.create(
-      game_id: 1,
-      ply: 1,
-      board_data: first_board_data,
-      white_to_move: true,
-      castling: "1111",
-      en_passant: "0000"
-    )
   end
 end
