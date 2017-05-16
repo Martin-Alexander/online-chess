@@ -1,5 +1,5 @@
-User.create(email: "martingianna@gmail.com", password: "123456")
-User.create(email: "player_two@gmail.com", password: "123456")
+User.create(email: "martin", password: "123456")
+User.create(email: "player_two", password: "123456")
 
 Game.create( white_id: 1, black_id: 2)
 
