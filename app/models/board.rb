@@ -64,7 +64,7 @@ class Board < ApplicationRecord
 
   def execute_move(board, move)
     board_copy = board.map { |i| i.dup }
-    if board_copy[move.start_square[0]][move.start_square[1]] == "white"
+    if board_copy[move.start_square[0]][move.start_square[1]].color == "white"
       promoted_piece = move.promotion
     else 
       promoted_piece = move.promotion * -1
