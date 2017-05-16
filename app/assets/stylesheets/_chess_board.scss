@@ -35,7 +35,7 @@ html {
 
 .promotion-prompt {
   z-index: 2;
-  width: 70%;
+  width: 70vmin;
   height: 20%;
   background-color: #769656;
   display: flex;
@@ -46,14 +46,14 @@ html {
 
 .promote-button {
   background-color: #EEEED2;
-  padding: 0.25vw;
-  width: 12.5vw;
-  height: 12.5vw;
+  padding: 0.25vmin;
+  width: 12.5vmin;
+  height: 12.5vmin;
   z-index: 3;
   border-radius: 2px;
   img {
-    width: 12.5vw;
-    height: 12.5vw;    
+    width: 12.5vmin;
+    height: 12.5vmin;  
     z-index: 3;
   }
 }
