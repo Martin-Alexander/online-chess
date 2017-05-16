@@ -33,6 +33,10 @@ class Board < ApplicationRecord
     return output
   end
 
+  def turn_player
+    white_to_move ? self.game.white : self.game.black
+  end
+
   def board_visualization
     board_data.to_board.each do |row|
       row.each { |square| print square < 0 ? "#{square} " : " #{square} " }
