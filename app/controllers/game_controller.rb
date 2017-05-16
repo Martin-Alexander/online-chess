@@ -53,16 +53,23 @@ class GameController < ApplicationController
   def move
     move = params[:move]
     my_move = Move.new([move[0].to_i, move[1].to_i], [move[2].to_i, move[3].to_i], promotion: move.length == 5 ? move[4].to_i : 0 )
-    board = Game.find(params[:gameId]).boards.last
+    current_game = Game.find(params[:gameId])
+    board = current_game.boards.last
     new_board = board.move(my_move)
     if (board.white_to_move && board.game.white == current_user) || (!board.white_to_move && board.game.black == current_user)
       if new_board
-        new_board.game = Game.find(params[:gameId])
+        new_board.game = current_game
         new_board.save
         ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data, white_to_move: new_board.white_to_move, game_id: params["gameId"].to_s }
       end
     else
       @not_your_turn = true
+    end
+    if new_board.turn_player.human == false
+      computer_move_board = new_board.move(new_board.moves.sample)
+      computer_move_board.game = current_game
+      computer_move_board.save!
+      ActionCable.server.broadcast "game_channel", { board_data: computer_move_board.board_data, white_to_move: computer_move_board.white_to_move, game_id: params["gameId"].to_s }
     end
   end
 end
