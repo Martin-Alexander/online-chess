@@ -163,6 +163,21 @@ class Board < ApplicationRecord
         end
       end
 
+      kings = [
+        [rank + 1, file + 1], [rank + 1, file], [rank + 1, file - 1], [rank, file + 1],
+        [rank, file - 1], [rank - 1, file + 1], [rank - 1, file], [rank - 1, file - 1]
+      ]
+
+      kings.each do |i|
+        if i[0] > 0 && i[1] > 0 &&
+          test_board[i[0]] && test_board[i[0]][i[1]] &&
+          test_board[i[0]][i[1]].piece == "king" &&
+          test_board[i[0]][i[1]].color != king_color
+          threat = true
+          throw :king_safety
+        end
+      end      
+
       knights = [
         [rank - 2, file + 1], [rank - 1, file + 2], [rank + 1, file + 2], [rank + 2, file + 1],
         [rank + 2, file - 1], [rank + 1, file - 2], [rank - 1, file - 2], [rank - 2, file - 1]
