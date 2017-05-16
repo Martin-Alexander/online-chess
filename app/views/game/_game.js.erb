@@ -49,8 +49,8 @@ function squareSelectHighlight($square) {
 
 function isTurnPlayersPiece($square) {
   if (
-    (white_to_move && whitePieceClasses.includes($square.attr("class").split(" ")[1])) || 
-    (!white_to_move && blackPieceClasses.includes($square.attr("class").split(" ")[1]))
+    (whiteToMove && whitePieceClasses.includes($square.attr("class").split(" ")[1])) || 
+    (!whiteToMove && blackPieceClasses.includes($square.attr("class").split(" ")[1]))
   ) {
     return true;
   } else {
@@ -69,7 +69,7 @@ function isAnyPieceSelected() {
 }
 
 var boardData;
-var white_to_move;
+var whiteToMove;
 var moves;
 var castling;
 var gameId = "<%= @game_id %>";
@@ -77,7 +77,7 @@ var gameId = "<%= @game_id %>";
 function getBoardData() {
   $.get("/data/" + gameId, function(data) {
     boardData = data["board_data"].split(",");
-    white_to_move = data["white_to_move"];
+    whiteToMove = data["white_to_move"];
     drawBoard(boardData);
   });
 }
@@ -101,6 +101,11 @@ $(document).ready(function(){
         },
         success: function() {
           getBoardData();
+          if (whiteToMove) {
+            $("#turn-player").text("White to move");
+          } else {
+            $("#turn-player").text("Black to move");
+          }
         }
       });
     }
