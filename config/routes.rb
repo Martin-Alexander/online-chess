@@ -11,8 +11,6 @@ Rails.application.routes.draw do
   
   post "move", to: "game#move", as: "move"
   
-  get "reset", to: "game#reset", as: "reset"
-
   mount ActionCable.server, at: '/cable'
 
 end
