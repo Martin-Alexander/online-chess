@@ -32,7 +32,11 @@ class GameController < ApplicationController
   end
 
   def show
-    @game_id = params[:game_id]
+    game = Game.find(params[:game_id])
+    @game_id = game.id
+    @black_player = game.black
+    @white_player = game.white
+    @white_to_move = game.boards.last.white_to_move
   end
 
   def data
@@ -50,10 +54,14 @@ class GameController < ApplicationController
     my_move = Move.new([move[0].to_i, move[1].to_i], [move[2].to_i, move[3].to_i])
     board = Game.find(params[:gameId]).boards.last
     new_board = board.move(my_move)
-    if new_board
-      new_board.game = Game.find(params[:gameId])
-      new_board.save
-      ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data, white_to_move: new_board.white_to_move, game_id: params["gameId"].to_s }
+    if (board.white_to_move && board.game.white == current_user) || (!board.white_to_move && board.game.black == current_user)
+      if new_board
+        new_board.game = Game.find(params[:gameId])
+        new_board.save
+        ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data, white_to_move: new_board.white_to_move, game_id: params["gameId"].to_s }
+      end
+    else
+      @not_your_turn = true
     end
   end
 
