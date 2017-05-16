@@ -68,12 +68,6 @@ function isAnyPieceSelected() {
   return result;
 }
 
-var boardData;
-var whiteToMove;
-var moves;
-var castling;
-var gameId = "<%= @game_id %>";
-
 function getBoardData() {
   $.get("/data/" + gameId, function(data) {
     boardData = data["board_data"].split(",");
@@ -82,32 +76,67 @@ function getBoardData() {
   });
 }
 
+function isPawnPromoted(move) {  
+  var isPawn = $("#" + selectedPiece).attr("class").split("").includes("p");
+  if (whiteToMove && move[2] == 0 && isPawn)  {
+    return true;
+  } else if (!whiteToMove && move[2] == 7 && isPawn) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function updateColorToMove() {
+  if (whiteToMove) {
+    $("#turn-player").text("White to move");
+  } else {
+    $("#turn-player").text("Black to move");
+  }  
+}
+
+function sendMoveToServer(move) {
+  $.ajax({
+    type: "POST",
+    url: "/move",
+    data: {
+      "move" : move,
+      "gameId" : gameId
+    },
+    success: function() {
+      getBoardData();
+      updateColorToMove();
+    }
+  });
+}
+
+var boardData;
+var whiteToMove;
+var moves;
+var castling;
+var selectedPiece;
+var gameId = "<%= @game_id %>";
+var move;
+
 $(document).ready(function(){
   getBoardData();
-  var selectedPiece;
+  $(".promote-button > img").click(function() {
+    var moveWithPromotion = move + $(this).parent().attr("id");
+    sendMoveToServer(moveWithPromotion);
+    $(".board-filter").css({"display" : "none"});
+  });
   $("td").click(function(){
     var $square = $(this);
     if (isTurnPlayersPiece($square)) {
       squareSelectHighlight($square);
       selectedPiece = $square.attr("id");
     } else if (isAnyPieceSelected()) {
-      var move = selectedPiece + $square.attr("id");
-      $.ajax({
-        type: "POST",
-        url: "/move",
-        data: {
-          "move" : move,
-          "gameId" : gameId
-        },
-        success: function() {
-          getBoardData();
-          if (whiteToMove) {
-            $("#turn-player").text("White to move");
-          } else {
-            $("#turn-player").text("Black to move");
-          }
-        }
-      });
+      move = selectedPiece + $square.attr("id");
+      if (isPawnPromoted(move)) {
+        $(".board-filter").css({"display" : "flex"});
+      } else {
+        sendMoveToServer(move);
+      }
     }
   });
-})
+});
