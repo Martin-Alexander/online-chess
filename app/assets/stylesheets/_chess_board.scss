@@ -19,6 +19,52 @@ html {
 }
 
 .board-container {
+  position: relative;
+}
+
+.board-filter {
+  display: none;
+  align-items: center;
+  justify-content: space-around;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.4);
+  z-index: 1;
+}
+
+.promotion-prompt {
+  z-index: 2;
+  width: 70%;
+  height: 20%;
+  background-color: #769656;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-radius: 2px;
+}
+
+.promote-button {
+  background-color: #EEEED2;
+  padding: 0.25vw;
+  width: 12.5vw;
+  height: 12.5vw;
+  z-index: 3;
+  border-radius: 2px;
+  img {
+    width: 12.5vw;
+    height: 12.5vw;    
+    z-index: 3;
+  }
+}
+
+.promote-to-knight {
+}
+.promote-to-bishop {
+}
+.promote-to-rook {
+}
+.promote-to-queen {
 }
 
 #chess-board {
