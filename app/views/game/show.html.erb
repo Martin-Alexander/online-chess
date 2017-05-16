@@ -1,6 +1,3 @@
-<div>
-  <%= link_to "Home", home_path %>
-</div>
 
 <div class="board-container">
   <table id="chess-board">
@@ -85,6 +82,24 @@
       <td id="77" class="white"></td>
     </tr>
   </table>
+</div>
+
+<div class="menu-padding">
+  <div class="std-box">
+    <div>
+      <%= link_to "Go back home", home_path %>
+    </div>
+    <div id="turn-player">
+      <% if @white_to_move %>
+        White to move
+      <% else %>
+        Black to move
+      <% end %>
+    </div>
+    <div>Black: <%= @black_player.email %></div>
+    <div>White: <%= @white_player.email %></div>
+  </div>
+  
 </div>
 
 <script>

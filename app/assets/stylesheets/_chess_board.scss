@@ -1,10 +1,21 @@
 table {
   border-collapse: collapse;
   margin: 0px auto;
-  max-height: 768px;
-  max-width: 768px;
-  width: calc(100vmin - 36px);
-  height: calc(100vmin - 36px);
+}
+
+html {
+  @media (min-width: 768px) {
+    table {
+      height: 768px;
+      width: 768px;
+    }
+  }
+  @media (max-width: 768px) {
+    table {
+      height: 100vw;
+      width: 100vw;
+    }
+  }
 }
 
 .board-container {
