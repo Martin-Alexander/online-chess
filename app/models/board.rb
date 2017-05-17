@@ -326,14 +326,6 @@ class Board < ApplicationRecord
     end
   end
 
-  def each_square
-    (0..7).each do |rank|
-      (0..7).each do |file|
-        yield(rank, file)
-      end
-    end
-  end
-
   def remove_out_of_bounds(output)
     output.select { |i| i.in_bounds }
   end
