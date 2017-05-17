@@ -1,5 +1,9 @@
 # Load the Rails application.
 require_relative 'application'
+require_relative '../app/helpers/chess_piece.rb'
+require_relative '../app/helpers/parse_board.rb'
+require_relative '../app/helpers/serialize_board.rb'
+
 
 Fixnum.send(:include, ChessPiece)
 Array.send(:include, SerializeBoard)
