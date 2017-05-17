@@ -61,12 +61,12 @@ class GameController < ApplicationController
         new_board.game = current_game
         new_board.save
         ActionCable.server.broadcast "game_channel", { board_data: new_board.board_data, white_to_move: new_board.white_to_move, game_id: params["gameId"].to_s }
+        if new_board.turn_player.human == false
+          EngineThought.perform_later(new_board.id, params[:gameId], new_board.turn_player.email)
+        end
       end
     else
       @not_your_turn = true
-    end
-    if new_board.turn_player.human == false
-      EngineThought.perform_later(new_board.id, params[:gameId])
     end
   end
 end
