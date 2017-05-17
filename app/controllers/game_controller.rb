@@ -66,10 +66,7 @@ class GameController < ApplicationController
       @not_your_turn = true
     end
     if new_board.turn_player.human == false
-      computer_move_board = new_board.move(new_board.moves.sample)
-      computer_move_board.game = current_game
-      computer_move_board.save!
-      ActionCable.server.broadcast "game_channel", { board_data: computer_move_board.board_data, white_to_move: computer_move_board.white_to_move, game_id: params["gameId"].to_s }
+      EngineThought.perform_later(new_board.id, params[:gameId])
     end
   end
 end
