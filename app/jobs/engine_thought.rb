@@ -106,14 +106,14 @@ class EngineThought < ApplicationJob
 
 	# ============ CHESS ENGINES ============
 
-  def dummy(initial_board, current_game)
+  def babyBurger(initial_board, current_game)
 	  computer_move_board = initial_board.move(initial_board.moves.sample)
     computer_move_board.game = current_game
     computer_move_board.save!
     ActionCable.server.broadcast "game_channel", { board_data: computer_move_board.board_data, white_to_move: computer_move_board.white_to_move, game_id: current_game.id.to_s }
   end
 
-  def baby(initial_board, current_game)
+  def teenBurger(initial_board, current_game)
   	legal_moves = initial_board.moves
   	legal_moves_indexes = (0...legal_moves.length).map { |i| i }
   	move_evaluations = legal_moves.map { |legal_move| static_board_evaluation(initial_board.move(legal_move).board_data.to_board) }

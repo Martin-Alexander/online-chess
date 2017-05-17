@@ -1,7 +1,8 @@
 User.create(email: "martin", password: "123456", human: true)
 User.create(email: "player_two", password: "123456", human: true)
 
-User.create(email: "Computer 1", password: "qwerty", human: false)
+User.create(email: "babyBurger", password: "qwerty", human: false)
+User.create(email: "teenBurger", password: "qwerty", human: false)
 
 Game.create( white_id: 1, black_id: 2)
 
