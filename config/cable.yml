@@ -3,10 +3,9 @@ redis: &redis
   url: redis://localhost:6379/1
 
 development: *redis
+
 test:
   adapter: async
 
 production:
-  adapter: redis
-  url: http://my-online-chess.herokuapp.com/
-  channel_prefix: online-chess_production
+  adapter: async
