@@ -4,13 +4,14 @@ table {
 }
 
 html {
-  @media (min-width: 768px) {
+  @media (min-width: 700px) {
     table {
-      height: 768px;
-      width: 768px;
+      margin-top: 10px;
+      height: 700px;
+      width: 700px;
     }
   }
-  @media (max-width: 768px) {
+  @media (max-width: 700px) {
     table {
       height: 100vw;
       width: 100vw;
