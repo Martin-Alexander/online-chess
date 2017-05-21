@@ -126,6 +126,10 @@ class EngineThought < ApplicationJob
   	ActionCable.server.broadcast "game_channel", { board_data: computer_move_board.board_data, white_to_move: computer_move_board.white_to_move, game_id: current_game.id.to_s }
   end
 
+  def mamaburger(initial_board, current_game)
+
+  end
+
   # ============ HELPER METHODS ============
 
   def static_board_evaluation(board_data)
@@ -142,4 +146,39 @@ class EngineThought < ApplicationJob
 	  end
 	  return total_material_score
   end
+
+	def deep_thought(board_object)
+		tree = []
+		board_object.moves.each do |move_one|
+			branch_one = []
+			tree << branch_one
+			first_level_board = board_object.move(move_one)
+			first_level_board.moves.each do |move_two|
+				branch_two = []
+				branch_one << branch_two
+				second_level_board = first_level_board.move(move_two)
+				second_level_board.each do |move_tree|
+					third_level_board = second_level_board.move(move_three)
+					branch_two << static_board_evaluation(third_level_board.board_data)
+				end
+			end
+		end
+		return tree
+	end
+
+	def tree_evaluator_helper(list, level)
+	  if list.all? { |i| i.kind_of?(Array) }
+	    if level % 2 == 0
+	      return(list.map { |j| (tree_evaluator_helper(j, level + 1)).max })
+	    else
+	      return(list.map { |j| (tree_evaluator_helper(j, level + 1)).min })
+	    end
+	  else
+	    return(list)  
+	  end
+	end
+
+	def tree_evaluator(list)
+	  tree_evaluator_helper(list, 1)
+	end
 end

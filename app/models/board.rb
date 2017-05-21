@@ -173,7 +173,7 @@ class Board < ApplicationRecord
       ]
 
       kings.each do |i|
-        if i[0] > 0 && i[1] > 0 &&
+        if i[0] >= 0 && i[1] >= 0 &&
           test_board[i[0]] && test_board[i[0]][i[1]] &&
           test_board[i[0]][i[1]].piece == "king" &&
           test_board[i[0]][i[1]].color != king_color
