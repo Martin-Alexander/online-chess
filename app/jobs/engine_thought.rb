@@ -26,7 +26,7 @@ class EngineThought < ApplicationJob
 		[0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6],
 		[0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
 		[0.1, 0.1, 0.2, 0.5, 0.5, 0.2, 0.1, 0.1],
-		[0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.1],
+		[0.1, 0.1, 0.3, 0.3, 0.3, 0.3, 0.1, 0.1],
 		[0, 0, 0, 0, 0, 0, 0, 0],
 		[0, 0, 0, 0, 0, 0, 0, 0]
 	]
@@ -83,7 +83,7 @@ class EngineThought < ApplicationJob
 		[0, 0, 0, 0, 0, 0, 0, 0],
 		[-0.4, -0.4, -0.4, -0.4, -0.4, -0.4, -0.4, -0.4],
 		[-0.2, -0.2, -0.2, -0.2, -0.2, -0.2, -0.2, -0.2],
-		[0.2, 0.2, 10, 0.2, 0.2, 0.2, 10, 0.2]
+		[0.2, 0.2, 0.8, 0.2, 0.2, 0.2, 0.8, 0.2]
 	]
 
 	PIECE_VALUE = {
@@ -127,7 +127,12 @@ class EngineThought < ApplicationJob
   end
 
   def mamaburger(initial_board, current_game)
-  	best_move_index = tree_evaluator(deep_thought(initial_board)).each_with_index.max[1]
+  	move_evaluations = tree_evaluator(deep_thought(initial_board))
+  	best_move_index = move_evaluations.each_with_index.min[1]
+  	worst_move_index = move_evaluations.each_with_index.max[1]
+		# initial_board.moves.each_with_index { |e, i| puts "#{e.to_s}: #{move_evaluations[i]}" }
+  	# puts "best: #{initial_board.moves[best_move_index].to_s}"
+  	# puts "worst: #{initial_board.moves[worst_move_index].to_s}"
   	computer_move_board = initial_board.move(initial_board.moves[best_move_index])
   	computer_move_board.game = current_game
     computer_move_board.save!
@@ -152,23 +157,28 @@ class EngineThought < ApplicationJob
   end
 
   def deep_thought(board_object)
+  	start_time = Time.now
     tree = []
-    count = board_object.moves.length
     board_object.moves.each_with_index do |move_one, i|
-    	puts "#{i / (count * 1.00)}" 
+    	puts "#{i / (board_object.moves.length * 1.00)}" 
       branch_one = []
       tree << branch_one
       first_level_board = board_object.move(move_one)
-      first_level_board.moves.each do |move_two|
+      first_empty = first_level_board.moves.each do |move_two|
         branch_two = []
         branch_one << branch_two
         second_level_board = first_level_board.move(move_two)
-        second_level_board.moves.each do |move_three|
+        second_empty = second_level_board.moves.each do |move_three|
           third_level_board = second_level_board.move(move_three)
-          branch_two << static_board_evaluation(third_level_board.board_data.to_board)
-        end
-      end
+          evaluation = static_board_evaluation(third_level_board.board_data.to_board)
+          branch_two << evaluation
+        end.empty?
+        branch_one << [999] if second_empty
+      end.empty?
+      tree << [[-999]] if first_empty
     end
+    end_time = Time.now
+    puts "#{tree.flatten.length} boards evaluated in #{(end_time - start_time) / 60.0} minutes"
     return tree
   end
 
