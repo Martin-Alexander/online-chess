@@ -155,7 +155,7 @@ class EngineThought < ApplicationJob
     tree = []
     count = board_object.moves.length
     board_object.moves.each_with_index do |move_one, i|
-    	puts "#{i / count}" 
+    	puts "#{i / (count * 1.00)}" 
       branch_one = []
       tree << branch_one
       first_level_board = board_object.move(move_one)
