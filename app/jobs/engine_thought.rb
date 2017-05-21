@@ -122,7 +122,7 @@ class EngineThought < ApplicationJob
   	)
     computer_move_board.game = current_game
     computer_move_board.save!
-    puts "===== ENGINE THOUGHT teenBurger ====="
+    sleep(0.5)
   	ActionCable.server.broadcast "game_channel", { board_data: computer_move_board.board_data, white_to_move: computer_move_board.white_to_move, game_id: current_game.id.to_s }
   end
 
