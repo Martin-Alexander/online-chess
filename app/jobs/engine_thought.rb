@@ -127,7 +127,11 @@ class EngineThought < ApplicationJob
   end
 
   def mamaburger(initial_board, current_game)
-
+  	best_move_index = tree_evaluator(deep_thought(initial_board)).each_with_index.max[1]
+  	computer_move_board = initial_board.move(initial_board.moves[best_move_index])
+  	computer_move_board.game = current_game
+    computer_move_board.save!
+  	ActionCable.server.broadcast "game_channel", { board_data: computer_move_board.board_data, white_to_move: computer_move_board.white_to_move, game_id: current_game.id.to_s }
   end
 
   # ============ HELPER METHODS ============
@@ -147,24 +151,26 @@ class EngineThought < ApplicationJob
 	  return total_material_score
   end
 
-	def deep_thought(board_object)
-		tree = []
-		board_object.moves.each do |move_one|
-			branch_one = []
-			tree << branch_one
-			first_level_board = board_object.move(move_one)
-			first_level_board.moves.each do |move_two|
-				branch_two = []
-				branch_one << branch_two
-				second_level_board = first_level_board.move(move_two)
-				second_level_board.each do |move_tree|
-					third_level_board = second_level_board.move(move_three)
-					branch_two << static_board_evaluation(third_level_board.board_data)
-				end
-			end
-		end
-		return tree
-	end
+  def deep_thought(board_object)
+    tree = []
+    count = board_object.moves.length
+    board_object.moves.each_with_index do |move_one, i|
+    	puts "#{i / count}" 
+      branch_one = []
+      tree << branch_one
+      first_level_board = board_object.move(move_one)
+      first_level_board.moves.each do |move_two|
+        branch_two = []
+        branch_one << branch_two
+        second_level_board = first_level_board.move(move_two)
+        second_level_board.moves.each do |move_three|
+          third_level_board = second_level_board.move(move_three)
+          branch_two << static_board_evaluation(third_level_board.board_data.to_board)
+        end
+      end
+    end
+    return tree
+  end
 
 	def tree_evaluator_helper(list, level)
 	  if list.all? { |i| i.kind_of?(Array) }
