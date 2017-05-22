@@ -34,10 +34,10 @@ class EngineThought < ApplicationJob
 	KNIGHT_POS_EVAL = [
 		[-0.4, -0.4, -0.4, -0.4, -0.4, -0.4, -0.4, -0.4],
 		[-0.4, 0, 0, 0, 0, 0, 0, -0.4],
-		[-0.4, 0, 0, 0, 0, 0, 0, -0.4],
-		[-0.4, 0, 0, 0, 0, 0, 0, -0.4],
-		[-0.4, 0, 0, 0, 0, 0, 0, -0.4],
-		[-0.4, 0, 0, 0, 0, 0, 0, -0.4],
+		[-0.4, 0, 0.2, 0.2, 0.2, 0.2, 0, -0.4],
+		[-0.4, 0, 0.2, 0.4, 0.4, 0.2, 0, -0.4],
+		[-0.4, 0, 0.2, 0.4, 0.4, 0.2, 0, -0.4],
+		[-0.4, 0, 0.2, 0.2, 0.2, 0.2, 0, -0.4],
 		[-0.4, 0, 0, 0, 0, 0, 0, -0.4],
 		[-0.4, -0.4, -0.4, -0.4, -0.4, -0.4, -0.4, -0.4]
 	]
@@ -156,38 +156,73 @@ class EngineThought < ApplicationJob
 	  return total_material_score
   end
 
-  def deep_thought(board_object)
+  # def deep_thought(board_object)
+  # 	start_time = Time.now
+  #   tree = []
+  #   board_object.moves.each_with_index do |move_one, i|
+  #   	puts "#{i / (board_object.moves.length * 1.00)}" 
+  #     branch_one = []
+  #     tree << branch_one
+  #     first_level_board = board_object.computer_move(move_one)
+  #     first_empty = first_level_board.moves.each do |move_two|
+  #       branch_two = []
+  #       branch_one << branch_two
+  #       second_level_board = first_level_board.computer_move(move_two)
+  #       second_empty = second_level_board.moves.each do |move_three|
+  #         third_level_board = second_level_board.computer_move(move_three)
+  #         evaluation = static_board_evaluation(third_level_board.board_data.to_board)
+  #         branch_two << evaluation
+  #       end.empty?
+  #       branch_one << [999] if second_empty
+  #     end.empty?
+  #     tree << [[-999]] if first_empty
+  #   end
+  #   end_time = Time.now
+  #   puts "#{tree.flatten.length} boards evaluated in #{(end_time - start_time) / 60.0} minutes"
+  #   tree.flatten.any? { |i| i.nil? } ? print("there is a nil") : print("there is not a nil")
+  #   return tree
+  # end
+
+	def deep_thought(board_object)
   	start_time = Time.now
-    tree = []
-    board_object.moves.each_with_index do |move_one, i|
+	  tree = []
+	  board_object.moves.each_with_index do |move_one, i|
     	puts "#{i / (board_object.moves.length * 1.00)}" 
       branch_one = []
-      tree << branch_one
-      first_level_board = board_object.move(move_one)
-      first_empty = first_level_board.moves.each do |move_two|
-        branch_two = []
-        branch_one << branch_two
-        second_level_board = first_level_board.move(move_two)
-        second_empty = second_level_board.moves.each do |move_three|
-          third_level_board = second_level_board.move(move_three)
-          evaluation = static_board_evaluation(third_level_board.board_data.to_board)
-          branch_two << evaluation
-        end.empty?
-        branch_one << [999] if second_empty
-      end.empty?
-      tree << [[-999]] if first_empty
-    end
+      first_level_board = board_object.computer_move(move_one)
+      first_level_board_moves = first_level_board.moves
+	    if first_level_board_moves.empty?
+	      tree << [[-999]]
+	    else
+	      tree << branch_one
+	      first_level_board_moves.each do |move_two|
+	        branch_two = []
+	        second_level_board = first_level_board.computer_move(move_two)
+	        second_level_board_moves = second_level_board.moves
+	        if second_level_board_moves.empty?
+            branch_one << [999]
+	        else
+	          branch_one << branch_two
+	          second_level_board_moves.each do |move_three|
+	            third_level_board = second_level_board.computer_move(move_three)
+              branch_two << static_board_evaluation(third_level_board.board_data.to_board)
+	          end
+	        end
+	      end
+	    end
+	  end
     end_time = Time.now
     puts "#{tree.flatten.length} boards evaluated in #{(end_time - start_time) / 60.0} minutes"
     return tree
   end
 
+
 	def tree_evaluator_helper(list, level)
 	  if list.all? { |i| i.kind_of?(Array) }
 	    if level % 2 == 0
-	      return(list.map { |j| (tree_evaluator_helper(j, level + 1)).max })
-	    else
 	      return(list.map { |j| (tree_evaluator_helper(j, level + 1)).min })
+	    else
+	      return(list.map { |j| (tree_evaluator_helper(j, level + 1)).max })
 	    end
 	  else
 	    return(list)  

@@ -16,6 +16,11 @@ class Board < ApplicationRecord
     return new_board
   end
 
+  def computer_move(move)
+    new_board_data = execute_move(board_data.to_board, move).serialize_board
+    Board.new(ply: ply + 1, board_data: new_board_data, white_to_move: !white_to_move, castling: castling_update(move), en_passant: en_passant)
+  end
+
   def moves
     output = []
     each_square do |rank, file|
