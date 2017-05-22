@@ -81,16 +81,16 @@ class Board < ApplicationRecord
     piece_on_arrival = move.promotion.zero? ? board_copy[move.start_square[0]][move.start_square[1]] : promoted_piece
     board_copy[move.end_square[0]][move.end_square[1]] = piece_on_arrival
     board_copy[move.start_square[0]][move.start_square[1]] = 0
-    if move.start_square == [7, 4] && move.end_square == [7, 6]
+    if move.start_square == [7, 4] && move.end_square == [7, 6] && board[move.start_square[0]][move.start_square[1]].piece == "king"
         board_copy[7][7] = 0
         board_copy[7][5] = 4
-    elsif move.start_square == [7, 4] && move.end_square == [7, 2]
+    elsif move.start_square == [7, 4] && move.end_square == [7, 2] && board[move.start_square[0]][move.start_square[1]].piece == "king"
         board_copy[7][0] = 0
         board_copy[7][3] = 4
-    elsif move.start_square == [0, 4] && move.end_square == [0, 6]
+    elsif move.start_square == [0, 4] && move.end_square == [0, 6] && board[move.start_square[0]][move.start_square[1]].piece == "king"
         board_copy[0][7] = 0
         board_copy[0][5] = -4
-    elsif move.start_square == [0, 4] && move.end_square == [0, 2]
+    elsif move.start_square == [0, 4] && move.end_square == [0, 2] && board[move.start_square[0]][move.start_square[1]].piece == "king"
         board_copy[0][0] = 0
         board_copy[0][3] = -4
     end
