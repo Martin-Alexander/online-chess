@@ -1,0 +1,10 @@
+html {
+	@media (min-width: 800px) {
+		body {
+			padding: 10px;
+		}
+	}
+}
+
+$max-board-size: 800px;
+$min-side-menu-size: 400px;

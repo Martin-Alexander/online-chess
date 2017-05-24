@@ -22,6 +22,11 @@ gem 'jquery-rails'
 
 gem 'redis'
 
+gem "bootstrap-sass"
+gem "font-awesome-sass"
+gem "simple_form"
+gem "autoprefixer-rails"
+
 gem 'sidekiq'
 # gem 'sidekiq-failures'
 
@@ -47,8 +52,8 @@ group :development, :test do
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '~> 2.13.0'
   gem 'selenium-webdriver'
-  gem 'better_errors'
-  gem 'binding_of_caller'
+  # gem 'better_errors'
+  # gem 'binding_of_caller'
 end
 
 group :development do

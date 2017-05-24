@@ -1,0 +1,21 @@
+#side-menu {
+	z-index: 2;
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: $max-board-size;
+	margin: 10px;
+	width: calc(50vw - 410px); // << half of viewport width and half of max board size minus 10px
+	min-width: $min-side-menu-size;
+	padding: 10px;
+	background-color: red;
+}
+
+
+html {
+	@media (max-width: $max-board-size + $min-side-menu-size + 9px) {
+		#side-menu {
+			display: none;
+		}
+	}
+}

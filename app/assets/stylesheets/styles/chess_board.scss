@@ -1,0 +1,42 @@
+#chess-board {
+  border-collapse: collapse;
+  height: 100vw;
+  width: 100vw;
+  max-height: $max-board-size;
+  max-width: $max-board-size;
+  tr {
+    td {
+      background-size: contain;
+    }
+  }
+}
+
+#board-container {
+  position: relative;
+  max-width: $max-board-size;
+  margin: 0px auto;
+}
+
+html {
+  @media (max-width: ($min-side-menu-size * 2) + $max-board-size + 10px) and (min-width: $max-board-size + $min-side-menu-size + 10px) {
+    #board-container {
+      margin: 0 0 0 $min-side-menu-size;
+    }
+  }
+}
+
+.white {
+  background-color: #EEEED2;
+}
+
+.black {
+  background-color: #769656;
+}
+
+.white-square-highlight {
+  background-color: #F7F783;
+}
+
+.black-square-highlight {
+  background-color: #BACB44;
+}
