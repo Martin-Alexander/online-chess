@@ -1,43 +1,50 @@
 <div class="my-wrapper">
 	<div id="home-menu-container">
+		<div id="signed-in-as">
+			<% if current_user %>
+				Signed in as <strong><%= current_user.email %></strong>
+			<% end %>
+		</div>
 		<div id="title">
 			My Online Chess
 		</div>
 		<div id="home-menu">
 			<div id="play">
 				<%= link_to new_single_player_path do %>
-					<div id="sinlge-player" class="home-button">
+					<div id="sinlge-player" class="home-button chess-btn">
 						Single Player
 					</div>
 				<% end %>
 				<% if current_user %>
 					<%= link_to new_multiplayer_path do %>
-						<div id="multiplayer" class="home-button">
+						<div id="multiplayer" class="home-button chess-btn">
 							Multiplayer
 						</div>
 					<% end %>				
 				<% else %>
 					<%= link_to new_user_session_path do %>
-						<div id="multiplayer" class="home-button">
+						<div id="multiplayer" class="home-button chess-btn">
 							Multiplayer
 						</div>
 					<% end %>
 				
 				<% end %>
 			</div>
+			<div">
 			<% if current_user %>
 				<%= link_to destroy_user_session_path, method: :delete do %>
-					<div class="home-button">
+					<div class="home-button chess-btn">
 						My Profile
 					</div>
 				<% end %>
 			<% else %>
 				<%= link_to new_user_session_path do %>
-					<div class="home-button">
+					<div class="home-button chess-btn">
 						Sign In or Sign Up
 					</div>
 				<% end %>
 			<% end %>
+			</div>
 		</div>
 	</div>
 </div>

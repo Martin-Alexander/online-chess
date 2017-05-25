@@ -24,7 +24,7 @@
 	flex-direction: column;
 	justify-content: space-between;
 
-	padding: 8% 0 25% 0;
+	padding: 8% 0 20% 0;
 }
 
 #play {
@@ -33,17 +33,9 @@
 	justify-content: space-around;
 }
 
-.home-button {
-	padding: 10px;
-	margin: 10px 20px;
-	height: 10vh;
-
-	background-color: $chess-black;
-	text-align: center;
-	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-	border-radius: $border-radius;
-
-	color: rgb(240, 240, 240);
-	font-size: 30px;
-	font-weight: bold;
+#signed-in-as {
+	margin: 0 20px;
+	margin-top: 15px;
+	color: rgb(40, 40, 40);
+	font-size: 18px;
 }

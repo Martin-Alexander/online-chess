@@ -31,7 +31,9 @@
 	color: rgb(50, 50, 50);
 	font-size: 28px;
 	font-weight: bold;
-
+	&:hover {
+		cursor: pointer;
+	}
 	i {
 		margin-right: 10px;
 	}
@@ -46,50 +48,3 @@
 .hide-this {
 }
 
-.chess-button {
-	background-color: $chess-black;
-	color: rgb(230, 230, 230);
-	
-	display: flex;
-	justify-content: space-around;
-	align-items: center;
-
-	border-radius: $border-radius;
-	box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.back-home-button {
-	width: 75%;
-	padding: 10px 30px;
-
-	margin: 0 auto 20px auto;
-
-	font-size: 25px;
-	font-weight: bold; 
-	color: $chess-black;
-
-	display: flex;
-	justify-content: space-around;
-	align-items: center;
-
-	text-decoration: underline;
-}
-
-.play-button {
-	width: 70%;
-	font-size: 20px;
-	font-weight: bold; 
-	height: 50px;
-
-	margin-top: 10px;
-	margin-left: 40.5px;
-}
-
-.new-multiplayer-game {
-	width: 70%;
-	font-size: 20px;
-	font-weight: bold; 
-	height: 50px;
-	
-	margin: 20px auto;
-}
