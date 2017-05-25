@@ -1,0 +1,83 @@
+<div class="my-wrapper">
+	<div class="new-game-container">
+		<div>
+			<div class="choose-an-opponent">
+				<em>Choose an AI Oppenent!</em>
+			</div>
+			<div id="engine-choice">
+				<div class="choose-engine">
+					<div class="engine-name">
+						<i class="fa fa-caret-right"></i>Baby Burger
+					</div>
+					<div class="engine-description" style="display: none;">
+						<ul>
+							<li>Choose moves at random</li>
+							<li><strong>Quick:</strong> Makes moves almost instantly</li>
+						</ul>
+						<%= link_to create_path, method: :post, data: { ai: "babyburger" } do %>
+							<div class="play-button chess-button">
+								<div>PLAY</div>
+							</div>
+						<% end %>
+					</div>
+				</div>
+				<div class="choose-engine">
+					<div class="engine-name">
+						<i class="fa fa-caret-right"></i>Teen Burger
+					</div>		
+					<div class="engine-description" style="display: none;">
+						<ul>
+							<li>Evaluates moves based on piece positioning as well as the balance of material</li>
+							<li><strong>Short-sighted:</strong> Makes moves based on their most imediate consequences without concern for how his oppenent will respond </li>
+							<li><strong>Quick:</strong> Makes moves almost instantly</li>
+						</ul>
+						<%= link_to create_path, method: :post, data: { ai: "teenburger" } do %>
+							<div class="play-button chess-button">
+								<div>PLAY</div>
+							</div>
+						<% end %>			
+					</div>	
+				</div>
+				<div class="choose-engine">
+					<div class="engine-name">
+						<i class="fa fa-caret-right"></i>Mama Burger		
+					</div>
+					<div class="engine-description" style="display: none;">
+						<ul>
+							<li>Evaluates moves based on piece positioning as well as the balance of material</li>
+							<li><strong>Thoughtful:</strong> Looks three turns (plies) into the future before each move</li>
+							<li><strong>Slow:</strong> Spends an average of 30 seconds calculating her next move</li>
+						</ul>
+						<%= link_to create_path(ai: "mamaburger"), method: :post do %>
+							<div class="play-button chess-button">
+								<div>PLAY</div>
+							</div>
+						<% end %>
+					</div>				
+				</div>
+			</div>
+		</div>
+		<%= link_to home_path do %>
+			<div class="back-home-button">
+				Go Back Home
+			</div>
+		<% end %>
+	</div>
+
+</div>
+
+<script>
+	$(document).ready(function(){
+		$(".engine-name").click(function(){
+			if ($(this).siblings(".engine-description").is(":visible")) {
+				$(this).siblings(".engine-description").slideUp(150);
+				$(this).find("i").removeClass("fa-caret-down").addClass("fa-caret-right");
+			} else {
+				$(".engine-description").slideUp(150);
+				$(".fa").removeClass("fa-caret-down").addClass("fa-caret-right");
+				$(this).siblings(".engine-description").slideDown(150);
+				$(this).find("i").removeClass("fa-caret-right").addClass("fa-caret-down");
+			}
+		})
+	});
+</script>
