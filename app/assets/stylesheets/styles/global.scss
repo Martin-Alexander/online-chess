@@ -1,3 +1,14 @@
+.std-box {
+	margin: 10px 0;
+	padding: 10px;
+	background-color: lightgrey;
+}
+
+.clickable-box {
+	color: black;
+	text-decoration: none;
+}
+
 html {
 	@media (min-width: 800px) {
 		body {
@@ -8,3 +19,11 @@ html {
 
 $max-board-size: 800px;
 $min-side-menu-size: 400px;
+
+$chess-white: #EEEED2;
+$chess-black: #769656;
+
+$chess-white-highlight: #F7F783;
+$chess-black-highlight: #BACB44;
+
+$border-radius: 2px;
