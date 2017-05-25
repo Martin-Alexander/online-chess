@@ -4,7 +4,10 @@ Rails.application.routes.draw do
   root to: "game#home", as: "home"
 
   get "new-single-player", to: "game#new_single_player", as: "new_single_player"
-  get "new-multiplater", to: "game#new_multiplayer", as: "new_multiplayer"
+  get "new-multiplayer", to: "game#new_multiplayer", as: "new_multiplayer"
+
+  get "lobby", to: "game#lobby", as: "lobby"
+
   post "create", to: "game#create", as: "create"
 
   get "game/:game_id", to: "game#show", as: "show"
