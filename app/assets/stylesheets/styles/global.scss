@@ -9,12 +9,28 @@
 	text-decoration: none;
 }
 
+.my-wrapper {
+	max-width: 600px;
+	height: 100vh;
+	margin: 0 auto;
+}
+
 html {
 	@media (min-width: 800px) {
 		body {
 			padding: 10px;
 		}
 	}
+}
+
+a {
+	&:hover {
+		text-decoration: none;
+	}
+}
+
+body {
+	background-color: #EEEED2;
 }
 
 $max-board-size: 800px;
