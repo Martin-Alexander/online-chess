@@ -1,16 +1,16 @@
-<div id="home-menu-wrapper">
+<div class="my-wrapper">
 	<div id="home-menu-container">
 		<div id="title">
 			My Online Chess
 		</div>
 		<div id="home-menu">
 			<div id="play">
-				<%= link_to new_path do %>
+				<%= link_to new_single_player_path do %>
 					<div id="sinlge-player" class="home-button">
 						Single Player
 					</div>
 				<% end %>
-				<%= link_to new_path do %>
+				<%= link_to new_multiplayer_path do %>
 					<div id="multiplayer" class="home-button">
 						Multiplayer
 					</div>
@@ -24,9 +24,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	body {
-		background-color: #EEEED2;
-	}
-</style>
