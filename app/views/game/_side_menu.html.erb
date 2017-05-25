@@ -1,0 +1,8 @@
+<div id="side-menu" class="std-box">
+  <div><%= link_to "Go back home", home_path %></div>
+  <div id="turn-player">
+    <%= @white_to_move ? "White" : "Black" %> to move
+  </div>
+  <div>Black: <%= @black_player.email %></div>
+  <div>White: <%= @white_player.email %></div>
+</div>
