@@ -5,6 +5,7 @@
 				<em>Choose an AI Oppenent!</em>
 			</div>
 			<div id="engine-choice">
+
 				<div class="choose-engine">
 					<div class="engine-name">
 						<i class="fa fa-caret-right"></i>Baby Burger
@@ -14,13 +15,14 @@
 							<li>Choose moves at random</li>
 							<li><strong>Quick:</strong> Makes moves almost instantly</li>
 						</ul>
-						<%= link_to create_path, method: :post, data: { ai: "babyburger" } do %>
+						<%= link_to create_path(ai: "babyburger"), method: :post do %>
 							<div class="play-button chess-button">
 								<div>PLAY</div>
 							</div>
 						<% end %>
 					</div>
 				</div>
+
 				<div class="choose-engine">
 					<div class="engine-name">
 						<i class="fa fa-caret-right"></i>Teen Burger
@@ -31,13 +33,14 @@
 							<li><strong>Short-sighted:</strong> Makes moves based on their most imediate consequences without concern for how his oppenent will respond </li>
 							<li><strong>Quick:</strong> Makes moves almost instantly</li>
 						</ul>
-						<%= link_to create_path, method: :post, data: { ai: "teenburger" } do %>
+						<%= link_to create_path(ai: "teenburger"), method: :post do %>
 							<div class="play-button chess-button">
 								<div>PLAY</div>
 							</div>
 						<% end %>			
 					</div>	
 				</div>
+
 				<div class="choose-engine">
 					<div class="engine-name">
 						<i class="fa fa-caret-right"></i>Mama Burger		
@@ -55,6 +58,7 @@
 						<% end %>
 					</div>				
 				</div>
+				
 			</div>
 		</div>
 		<%= link_to home_path do %>

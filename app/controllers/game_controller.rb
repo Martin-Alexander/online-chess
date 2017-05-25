@@ -4,32 +4,19 @@ class GameController < ApplicationController
     @all_games = Game.all
   end
 
-  def new
-    if !current_user.nil?
-      # @all_other_players = User.where.not(email: current_user.email)
-      @all_other_players = User.all
-    else
-      redirect_to home_path
-    end
+  def new_single_player
+  end
+
+  def new_multiplayer
+    @list_of_users = User.where(human: true).where.not(email: "guest")
   end
 
   def create
-    white_to_move = params["white_to_move"]
-    board_data = params["board_data"]
-    player_two = params["player_two"]
-    player_one_color = params["player_one_color"]
-
-    game = if player_one_color == "white"
-      Game.create(white: current_user, black_id: player_two)
-    else
-      Game.create(white_id: player_two, black: current_user)
+    if params[:ai]
+      new_game = Game.create(white: current_user ? current_user : User.where(email: "guest").first, black: User.where(email: params[:ai]).first)
+      Board.create(game: new_game)
+      redirect_to show_path(new_game)
     end
-    if board_data.empty? 
-      Board.create!(game: game)
-    else
-      Board.create!(game: game, white_to_move: white_to_move, board_data: board_data)
-    end
-    redirect_to show_path(game.id)
   end
 
   def show
@@ -56,7 +43,7 @@ class GameController < ApplicationController
     current_game = Game.find(params[:gameId])
     board = current_game.boards.last
     new_board = board.move(my_move)
-    if (board.white_to_move && board.game.white == current_user) || (!board.white_to_move && board.game.black == current_user)
+    if board.turn_player == current_user || board.turn_player.email == "guest"
       if new_board
         new_board.game = current_game
         new_board.save

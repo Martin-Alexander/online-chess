@@ -10,17 +10,34 @@
 						Single Player
 					</div>
 				<% end %>
-				<%= link_to new_multiplayer_path do %>
-					<div id="multiplayer" class="home-button">
-						Multiplayer
-					</div>
+				<% if current_user %>
+					<%= link_to new_multiplayer_path do %>
+						<div id="multiplayer" class="home-button">
+							Multiplayer
+						</div>
+					<% end %>				
+				<% else %>
+					<%= link_to new_user_session_path do %>
+						<div id="multiplayer" class="home-button">
+							Multiplayer
+						</div>
+					<% end %>
+				
 				<% end %>
 			</div>
-			<%# unless current_user %>
-				<div id="begin-session" class="home-button">
-					Sign In or Sign Up
-				</div>
-			<%# end %>
+			<% if current_user %>
+				<%= link_to destroy_user_session_path, method: :delete do %>
+					<div class="home-button">
+						My Profile
+					</div>
+				<% end %>
+			<% else %>
+				<%= link_to new_user_session_path do %>
+					<div class="home-button">
+						Sign In or Sign Up
+					</div>
+				<% end %>
+			<% end %>
 		</div>
 	</div>
 </div>
