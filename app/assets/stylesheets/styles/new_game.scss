@@ -59,11 +59,12 @@
 }
 
 .choose-color-modal {
+	height: 200px;
 	margin-top: 20vh;
+	position: relative;
 
 	display: flex;
 	align-items: center;
-	justify-content: space-around;
 	flex-direction: column;
 
 	background-color: white;
