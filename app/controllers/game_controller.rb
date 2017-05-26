@@ -75,7 +75,7 @@ class GameController < ApplicationController
     board = current_game.boards.last
     new_board = board.move(move)
 
-    if board.turn_player == current_user || board.turn_player.email == "guest" || board.turn_player.human == false
+    if board.turn_player == current_user || board.turn_player.email == "guest"
       if new_board
         new_board.game = current_game
         new_board.save
