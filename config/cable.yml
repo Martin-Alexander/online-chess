@@ -2,7 +2,7 @@ redis: &redis
   adapter: redis
   url: redis://localhost:6379/1
 
-development: *redis
+development: &redis
 production: 
   adapter: redis
   url: redis://h:p4d50aab7289cc7077a93e81f6284b94803d6786aa3f71f53aac9693d40d10b6f@ec2-34-206-56-30.compute-1.amazonaws.com:54689

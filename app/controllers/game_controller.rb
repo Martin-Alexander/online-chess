@@ -20,17 +20,31 @@ class GameController < ApplicationController
 
   def create
     if params[:ai]
-      new_game = Game.create(
-        white: current_user ? current_user : User.find_by(email: "guest"),
-        black: User.find_by(email: params[:ai])
-      )
+      if params[:color] == "choose-white"
+        new_game = Game.create(
+          white: current_user ? current_user : User.find_by(email: "guest"),
+          black: User.find_by(email: params[:ai])
+        )
+      else
+        new_game = Game.create(
+          white: User.find_by(email: params[:ai]),
+          black: current_user ? current_user : User.find_by(email: "guest")
+        )
+      end
     else
       new_game = Game.create(
         white: current_user,
         black: nil
       )      
     end
-    Board.create(game: new_game)
+    Board.create(
+      game: new_game,
+      ply: 1,
+      board_data: "-4,-2,-3,-5,-6,-3,-2,-4,-1,-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,4,2,3,5,6,3,2,4",
+      white_to_move: true,
+      castling: "1111",
+      en_passant: "1111"
+    )
     redirect_to show_path(new_game)
   end
 
@@ -40,6 +54,9 @@ class GameController < ApplicationController
     @black_player = @game.black
     @white_player = @game.white
     @white_to_move = @game.boards.last.white_to_move
+    if @game.boards.last.turn_player.human == false
+        EngineThought.perform_later(@game.boards.last.id, @game.id, @game.boards.last.turn_player.email)      
+    end
   end
 
   def data
@@ -58,7 +75,7 @@ class GameController < ApplicationController
     board = current_game.boards.last
     new_board = board.move(move)
 
-    if board.turn_player == current_user || board.turn_player.email == "guest"
+    if board.turn_player == current_user || board.turn_player.email == "guest" || board.turn_player.human == false
       if new_board
         new_board.game = current_game
         new_board.save

@@ -48,3 +48,34 @@
 .hide-this {
 }
 
+.choose-color-modal-filter {
+	position: absolute;
+	width: 100%;
+	top: 0;
+	bottom: 0;
+	align-items: center;
+	justify-content: space-around;
+	background-color: rgba(255, 255, 255, 0.2);
+	display: none;
+}
+
+.choose-color-modal {
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	background-color: white;
+}
+
+.choose-color {
+	height: 96px;
+	width: 96px;
+	margin: 10px;
+}
+
+#choose-white {
+background-image: url("http://images.chesscomfiles.com/chess-themes/pieces/neo/96/wp.png");
+}
+
+#choose-black {
+	background-image: url("http://images.chesscomfiles.com/chess-themes/pieces/neo/96/bp.png");
+}

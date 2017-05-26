@@ -15,11 +15,9 @@
 							<li>Choose moves at random</li>
 							<li><strong>Quick:</strong> Makes moves almost instantly</li>
 						</ul>
-						<%= link_to create_path(ai: "babyburger"), method: :post do %>
-							<div class="play-button chess-btn">
-								<div>PLAY</div>
-							</div>
-						<% end %>
+						<div id="babyburger" class="play-button chess-btn">
+							<div>PLAY</div>
+						</div>
 					</div>
 				</div>
 
@@ -33,11 +31,9 @@
 							<li><strong>Short-sighted:</strong> Makes moves based on their most imediate consequences without concern for how his oppenent will respond </li>
 							<li><strong>Quick:</strong> Makes moves almost instantly</li>
 						</ul>
-						<%= link_to create_path(ai: "teenburger"), method: :post do %>
-							<div class="play-button chess-btn">
-								<div>PLAY</div>
-							</div>
-						<% end %>			
+						<div id="teenburger" class="play-button chess-btn">
+							<div>PLAY</div>
+						</div>
 					</div>	
 				</div>
 
@@ -51,11 +47,9 @@
 							<li><strong>Thoughtful:</strong> Looks three turns (plies) into the future before each move</li>
 							<li><strong>Slow:</strong> Spends an average of 30 seconds calculating her next move</li>
 						</ul>
-						<%= link_to create_path(ai: "mamaburger"), method: :post do %>
-							<div class="play-button chess-btn">
-								<div>PLAY</div>
-							</div>
-						<% end %>
+						<div id="mamaburger" class="play-button chess-btn">
+							<div>PLAY</div>
+						</div>
 					</div>				
 				</div>
 				
@@ -66,6 +60,13 @@
 				Go Back Home
 			</div>
 		<% end %>
+	</div>
+
+	<div class="choose-color-modal-filter">
+		<div class="choose-color-modal">
+			<div id="choose-white" class="choose-color">white</div>
+			<div id="choose-black" class="choose-color">black</div>
+		</div>
 	</div>
 
 </div>
@@ -82,6 +83,21 @@
 				$(this).siblings(".engine-description").slideDown(150);
 				$(this).find("i").removeClass("fa-caret-right").addClass("fa-caret-down");
 			}
-		})
+		});
+		$(".play-button").click(function(){
+			var ai = $(this).attr("id");
+			$(".choose-color-modal-filter").css({"display" : "flex"});
+			$(".choose-color").click(function(){
+				var color = $(this).attr("id");
+			  $.ajax({
+			    type: "POST",
+			    url: "/create",
+			    data: {
+			    	"ai" : ai,
+			    	"color" : color
+			    }
+			   });
+			});
+		});
 	});
 </script>
