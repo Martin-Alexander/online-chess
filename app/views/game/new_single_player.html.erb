@@ -8,7 +8,7 @@
 
 				<div class="choose-engine">
 					<div class="engine-name">
-						<i class="fa fa-caret-right"></i>Baby Burger
+						<i class="caret1 fa fa-caret-right"></i>Baby Burger
 					</div>
 					<div class="engine-description" style="display: none;">
 						<ul>
@@ -23,7 +23,7 @@
 
 				<div class="choose-engine">
 					<div class="engine-name">
-						<i class="fa fa-caret-right"></i>Teen Burger
+						<i class="caret1 fa fa-caret-right"></i>Teen Burger
 					</div>		
 					<div class="engine-description" style="display: none;">
 						<ul>
@@ -39,7 +39,7 @@
 
 				<div class="choose-engine">
 					<div class="engine-name">
-						<i class="fa fa-caret-right"></i>Mama Burger		
+						<i class="caret1 fa fa-caret-right"></i>Mama Burger		
 					</div>
 					<div class="engine-description" style="display: none;">
 						<ul>
@@ -64,8 +64,12 @@
 
 	<div class="choose-color-modal-filter">
 		<div class="choose-color-modal">
-			<div id="choose-white" class="choose-color"></div>
-			<div id="choose-black" class="choose-color"></div>
+			<i id="close-modal" class="fa fa-times"></i>
+			<div id="choose-color-title">Play as...</div>
+			<div id="color-choices">
+				<div id="choose-white" class="choose-color"></div>
+				<div id="choose-black" class="choose-color"></div>
+			</div>
 		</div>
 	</div>
 
@@ -76,12 +80,12 @@
 		$(".engine-name").click(function(){
 			if ($(this).siblings(".engine-description").is(":visible")) {
 				$(this).siblings(".engine-description").slideUp(150);
-				$(this).find("i").removeClass("fa-caret-down").addClass("fa-caret-right");
+				$(this).find(".caret1").removeClass("fa-caret-down").addClass("fa-caret-right");
 			} else {
 				$(".engine-description").slideUp(150);
-				$(".fa").removeClass("fa-caret-down").addClass("fa-caret-right");
+				$(".caret1").removeClass("fa-caret-down").addClass("fa-caret-right");
 				$(this).siblings(".engine-description").slideDown(150);
-				$(this).find("i").removeClass("fa-caret-right").addClass("fa-caret-down");
+				$(this).find(".caret1").removeClass("fa-caret-right").addClass("fa-caret-down");
 			}
 		});
 		$(".play-button").click(function(){
@@ -98,6 +102,9 @@
 			    }
 			   });
 			});
+		});
+		$("#close-modal").click(function(){
+			$(".choose-color-modal-filter").css({"display" : "none"});
 		});
 	});
 </script>

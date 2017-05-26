@@ -55,15 +55,48 @@
 	bottom: 0;
 	align-items: center;
 	justify-content: space-around;
-	// background-color: rgba(255, 255, 255, 0.2);
+	background-color: rgba(255, 255, 255, 0.4);
 	display: none;
 }
 
 .choose-color-modal {
+	position: absolute;
+	top: 20vh;
+	z-index: 2;
+
 	display: flex;
 	align-items: center;
 	justify-content: space-around;
+	flex-direction: column;
+
 	background-color: white;
+  padding: 20px;
+  border-radius: 2px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+#close-modal {
+	position: absolute;
+  top: 15px;
+  right: 20px;
+ }
+
+#choose-color-title {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+
+	font-size: 18px;
+	color: $chess-black;
+	font-weight: bold;
+
+	margin-bottom: 10px;
+}
+
+#color-choices {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
 }
 
 .choose-color {
@@ -73,9 +106,11 @@
 }
 
 #choose-white {
-background-image: url("http://images.chesscomfiles.com/chess-themes/pieces/neo/96/wp.png");
+	background-image: url("http://images.chesscomfiles.com/chess-themes/pieces/neo/96/wp.png");
+	background-color: $chess-black;
 }
 
 #choose-black {
 	background-image: url("http://images.chesscomfiles.com/chess-themes/pieces/neo/96/bp.png");
+	background-color: $chess-white;
 }
