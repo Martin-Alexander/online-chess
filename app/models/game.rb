@@ -1,10 +1,10 @@
 class Game < ApplicationRecord
-  belongs_to :black, class_name: "User"
-  belongs_to :white, class_name: "User"
+  belongs_to :black, class_name: "User", optional: true
+  belongs_to :white, class_name: "User", optional: true
   has_many :boards, dependent: :destroy
 
-  def unfull?
-  	white.nil? || black.nil?
+  def full?
+  	white && black
   end
 
   def game_over?

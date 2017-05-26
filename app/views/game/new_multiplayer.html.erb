@@ -4,12 +4,16 @@
 			<div class="choose-an-opponent">
 				<em>Find an Oppenent!</em>
 			</div>
-			<div class="new-multiplayer-game chess-btn">
-				Create
-			</div>
-			<div class="new-multiplayer-game chess-btn">
-				Join
-			</div>			
+			<%= link_to create_multiplayer_path do %>
+				<div class="new-multiplayer-game chess-btn">
+					Create
+				</div>
+			<% end %>
+			<%= link_to join_path do %>
+				<div class="new-multiplayer-game chess-btn">
+					Join
+				</div>			
+			<% end %>
 		</div>
 		<%= link_to home_path do %>
 			<div class="back-home-button chess-btn">

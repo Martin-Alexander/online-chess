@@ -1,0 +1,19 @@
+<% @games.each do |game| %>
+
+	<div>Host: <%= game.white.email %></div>
+	<div>Game id: <%= game.id %></div>
+	<div><%= link_to "Show", show_path(game) %></div>
+
+<% end %>
+
+<% if @games.empty? %>
+	<div class="choose-an-opponent">
+		<div>No games in the lobby...</div>
+		<div><%= link_to "Create one!", create_multiplayer_path %></div>
+	</div>
+<% end %>
+<%= link_to home_path do %>
+	<div class="back-home-button chess-btn">
+		Go Back Home
+	</div>
+<% end %>

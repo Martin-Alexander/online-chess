@@ -3,10 +3,13 @@ Rails.application.routes.draw do
 
   root to: "game#home", as: "home"
 
-  get "new-single-player", to: "game#new_single_player", as: "new_single_player"
-  get "new-multiplayer", to: "game#new_multiplayer", as: "new_multiplayer"
+  get "single-player", to: "game#new_single_player", as: "new_single_player"
+  get "single-player/create", to: "game#create_single_player", as: "create_single_player"
 
-  get "lobby", to: "game#lobby", as: "lobby"
+  get "multiplayer", to: "game#new_multiplayer", as: "new_multiplayer"
+  get "multiplayer/create", to: "game#create_multiplayer", as: "create_multiplayer"
+
+  get "multiplayer/join", to: "game#join", as: "join"
 
   post "create", to: "game#create", as: "create"
 
