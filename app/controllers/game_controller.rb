@@ -14,7 +14,7 @@ class GameController < ApplicationController
 
   def join
 
-    @games = Game.all.select { |game| !game.full? && game.white != current_user }
+    @games = Game.all.select { |game| !game.full? && game.white != current_user && game.black != current_user && game.black && game.white}
 
   end
 
