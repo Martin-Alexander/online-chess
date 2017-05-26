@@ -54,7 +54,7 @@ class GameController < ApplicationController
     @black_player = @game.black
     @white_player = @game.white
     @white_to_move = @game.boards.last.white_to_move
-    if @game.boards.last.turn_player.human == false
+    if @game.boards.last.turn_player.human == false && @game.boards.last.ply == 1
         EngineThought.perform_later(@game.boards.last.id, @game.id, @game.boards.last.turn_player.email)      
     end
   end
