@@ -316,7 +316,7 @@ class Board < ApplicationRecord
   end
 
 
-  def move_along (rank_mod, file_mod, sequence_builder, rank, file, output, board)
+  def move_along(rank_mod, file_mod, sequence_builder, rank, file, output, board)
     piece = board[rank][file]
     (1..sequence_builder).each do |increment|
       move = Move.new([rank, file], [rank + increment * rank_mod, file + increment * file_mod])
@@ -329,6 +329,19 @@ class Board < ApplicationRecord
         break
       end
     end
+  end
+
+  def king_safety_scan?(rank_mod, file_mod, sequence_builder, rank, file, board, threat_piece)
+    king = board[rank][file]
+    result = true
+    (1..sequence_builder).each do |increment|
+      square = board[rank + increment * rank_mod][file + increment * file_mod]
+      if square.color != king.color && (square.piece == "queen" || square.piece == threat_piece)
+        result = false
+        break
+      end
+    end
+    return result
   end
 
   def remove_out_of_bounds(output)
