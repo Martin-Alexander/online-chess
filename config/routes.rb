@@ -1,18 +1,24 @@
 Rails.application.routes.draw do
   devise_for :users
 
-  # TODO: Replace manual routing with "resources" rails helper 
+  root to: "pages#home", as: "home"
+    # home: View home page
 
-  root to: "page#home", as: "home"
-
-  resources :lobby, only: [:index, :new, :create] 
+  resources :lobbies, only: [:index, :show, :new, :create] 
     # index: List of lobbies that you can join
-    # create: Making a new lobby from 
+    # show: Inside lobby
+    # new: Choose between joining and creating a lobby
+    # create: Making a new lobby 
 
-  resources :games, only: [:show, :new, :create, :update]
-
-  resources :games do
-    resources :board, only: [:index, :show, :update]
+  resources :games, only: [:show, :new, :create, :update] do
+    # show: See the current state of a game (and play if possible)
+    # new: Choose which engine you want to play against and which color you want to be
+    # create: Make a new game
+    # update: change the game status (in progress, white win, black win, or tie)
+    resources :boards, only: [:index, :show, :update]
+      # index: View all moves made during a gmae
+      # show: Returns json of board state
+      # update: Make a move
   end
   
   mount ActionCable.server, at: '/cable'

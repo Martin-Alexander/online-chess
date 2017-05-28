@@ -1,4 +1,4 @@
-class BoardController < ApplicationController
+class BoardsController < ApplicationController
 
 	def index
 		#TODO: Viewing all moves for a game

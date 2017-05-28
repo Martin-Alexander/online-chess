@@ -10,13 +10,13 @@
 		</div>
 		<div id="home-menu">
 			<div id="play">
-				<%= link_to new_single_player_path do %>
+				<%= link_to new_game_path do %>
 					<div id="sinlge-player" class="home-button chess-btn">
 						Single Player
 					</div>
 				<% end %>
 				<% if current_user %>
-					<%= link_to new_multiplayer_path do %>
+					<%= link_to new_lobby_path do %>
 						<div id="multiplayer" class="home-button chess-btn">
 							Multiplayer
 						</div>

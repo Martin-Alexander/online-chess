@@ -9,7 +9,7 @@
 <% if @games.empty? %>
 	<div class="choose-an-opponent">
 		<div>No games in the lobby...</div>
-		<div><%= link_to "Create one!", create_multiplayer_path %></div>
+		<div><%= link_to "Create one!", lobbies_path, method: :post %></div>
 	</div>
 <% end %>
 <%= link_to home_path do %>

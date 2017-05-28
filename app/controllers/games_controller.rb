@@ -1,6 +1,6 @@
-class GameController < ApplicationController
+class GamesController < ApplicationController
 
-  def new_
+  def new
   end
 
   def create
@@ -27,7 +27,7 @@ class GameController < ApplicationController
       castling: "1111",
       en_passant: "1111"
     )
-    redirect_to show_path(new_game)
+    redirect_to game_path(new_game)
   end
 
   def show

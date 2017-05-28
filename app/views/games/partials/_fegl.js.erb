@@ -69,7 +69,7 @@ function isAnyPieceSelected() {
 }
 
 function getBoardData() {
-  $.get("/games/" + gameId + "/board/" + boardId, 
+  $.get("/games/" + gameId + "/boards/" + boardId, 
     function(data) {
       boardData = data["board_data"].split(",");
       whiteToMove = data["white_to_move"];
@@ -100,7 +100,7 @@ function updateColorToMove() {
 function sendMoveToServer(move) {
   $.ajax({
     type: "PATCH",
-    url: "/games/" + gameId + "/board/" + boardId,
+    url: "/games/" + gameId + "/boards/" + boardId,
     data: {"move" : move},
     success: function() {
       updateColorToMove();

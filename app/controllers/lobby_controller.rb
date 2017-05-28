@@ -1,2 +1,0 @@
-class LobbyController < ApplicationController
-end
