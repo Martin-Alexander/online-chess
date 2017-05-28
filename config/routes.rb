@@ -1,22 +1,19 @@
 Rails.application.routes.draw do
   devise_for :users
 
-  root to: "game#home", as: "home"
+  # TODO: Replace manual routing with "resources" rails helper 
 
-  get "single-player", to: "game#new_single_player", as: "new_single_player"
-  get "single-player/create", to: "game#create_single_player", as: "create_single_player"
+  root to: "page#home", as: "home"
 
-  get "multiplayer", to: "game#new_multiplayer", as: "new_multiplayer"
-  get "multiplayer/create", to: "game#create_multiplayer", as: "create_multiplayer"
+  resources :lobby, only: [:index, :new, :create] 
+    # index: List of lobbies that you can join
+    # create: Making a new lobby from 
 
-  get "multiplayer/join", to: "game#join", as: "join"
+  resources :games, only: [:show, :new, :create, :update]
 
-  post "create", to: "game#create", as: "create"
-
-  get "game/:game_id", to: "game#show", as: "show"
-  get "data/:game_id", to: "game#data", as: "data"
-  
-  post "move", to: "game#move", as: "move"
+  resources :games do
+    resources :board, only: [:index, :show, :update]
+  end
   
   mount ActionCable.server, at: '/cable'
 

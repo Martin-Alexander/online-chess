@@ -110,7 +110,7 @@ class EngineThought < ApplicationJob
 	computer_move_board = initial_board.move(initial_board.moves.sample)
     computer_move_board.game = current_game
     computer_move_board.save!
-    ActionCable.server.broadcast "game_channel", { board_data: computer_move_board.board_data, white_to_move: computer_move_board.white_to_move, game_id: current_game.id.to_s }
+    send_back_board(computer_move_board, current_game)
   end
 
   def teenburger(initial_board, current_game)
@@ -123,7 +123,7 @@ class EngineThought < ApplicationJob
     computer_move_board.game = current_game
     computer_move_board.save!
     sleep(0.5)
-  	ActionCable.server.broadcast "game_channel", { board_data: computer_move_board.board_data, white_to_move: computer_move_board.white_to_move, game_id: current_game.id.to_s }
+    send_back_board(computer_move_board, current_game)
   end
 
   def mamaburger(initial_board, current_game)
@@ -133,10 +133,19 @@ class EngineThought < ApplicationJob
   	computer_move_board = initial_board.move(initial_board.moves[best_move_index])
   	computer_move_board.game = current_game
     computer_move_board.save!
-  	ActionCable.server.broadcast "game_channel", { board_data: computer_move_board.board_data, white_to_move: computer_move_board.white_to_move, game_id: current_game.id.to_s }
+    send_back_board(computer_move_board, current_game)
   end
 
   # ============ HELPER METHODS ============
+
+  def send_back_board(board, game)
+  	ActionCable.server.broadcast "game_channel", {
+  		board_data: board.board_data,
+  		white_to_move: board.white_to_move,
+  		game_id: game.id,
+  		board_id: board.id
+  	}
+  end
 
   def static_board_evaluation(board_data)
   	total_material_score = 0

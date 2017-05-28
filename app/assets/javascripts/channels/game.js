@@ -5,6 +5,8 @@ App.game = App.cable.subscriptions.create("GameChannel", {
    	if (gameId == data.game_id) {
 	    drawBoard(data.board_data.split(","));
 	    whiteToMove = data.white_to_move;
+	    boardId = data.board_id;
+	    updateColorToMove();
   	}
   }
 });

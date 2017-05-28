@@ -69,10 +69,12 @@ function isAnyPieceSelected() {
 }
 
 function getBoardData() {
-  $.get("/data/" + gameId, function(data) {
-    boardData = data["board_data"].split(",");
-    whiteToMove = data["white_to_move"];
-    drawBoard(boardData);
+  $.get("/games/" + gameId + "/board/" + boardId, 
+    function(data) {
+      boardData = data["board_data"].split(",");
+      whiteToMove = data["white_to_move"];
+      drawBoard(boardData);
+      updateColorToMove();
   });
 }
 
@@ -89,20 +91,17 @@ function isPawnPromoted(move) {
 
 function updateColorToMove() {
   if (whiteToMove) {
-    $("#turn-player").text("White to move");
+    $(".turn-player").text("White to move");
   } else {
-    $("#turn-player").text("Black to move");
+    $(".turn-player").text("Black to move");
   }  
 }
 
 function sendMoveToServer(move) {
   $.ajax({
-    type: "POST",
-    url: "/move",
-    data: {
-      "move" : move,
-      "gameId" : gameId
-    },
+    type: "PATCH",
+    url: "/games/" + gameId + "/board/" + boardId,
+    data: {"move" : move},
     success: function() {
       updateColorToMove();
     }
@@ -111,10 +110,9 @@ function sendMoveToServer(move) {
 
 var boardData;
 var whiteToMove;
-var moves;
-var castling;
 var selectedPiece;
-var gameId = "<%= @game_id %>";
+var gameId = "<%= @game.id %>";
+var boardId = "<%= @board.id %>"
 var move;
 
 $(document).ready(function(){
