@@ -17,7 +17,19 @@ class GamesController < ApplicationController
         )
       end
     else
-      new_game = Game.create(white: current_user, black: nil)
+      host = User.find(params[:lobby_host])
+      nonhost = User.find(params[:nonhost])
+      if params[:host_is] == "random"
+        if rand > 0.5
+          new_game = Game.create(white: host, black: nonhost)
+        else
+          new_game = Game.create(white: nonhost, black: host)
+        end
+      elsif params[:host_is] == "white"
+        new_game = Game.create(white: host, black: nonhost)
+      else
+        new_game = Game.create(white: nonhost, black: host)
+      end
     end
     Board.create(
       game: new_game,

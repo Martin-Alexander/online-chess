@@ -1,0 +1,54 @@
+<div class="my-wrapper">
+	<% if @lobby %>
+
+		<div>Name: <%= @lobby.name%></div>
+
+		<% if @lobby.host == current_user %>
+
+			<div>
+				<%= form_tag lobby_path(@lobby), method: :patch do %>
+					<%= text_field_tag "name"%>
+					<%= submit_tag "Change lobby name" %>
+				<% end %>
+			</div>
+
+			<div>Hosted by: <strong>you</strong></div>
+			
+			<%= link_to "Delete lobby", lobby_path(@lobby), method: :delete %>
+
+			<% if @player_color == 0 %>
+				<div>Colors will be decided randomly</div>
+			<% elsif @player_color == 1 %>
+				<div>You play as black</div>
+			<% else %>
+				<div>You play as white</div>
+			<% end %>
+			<div>
+				<%= form_tag lobby_path(@lobby), method: :patch do %>
+					<%= submit_tag "Play as..." %>
+					<%= select_tag "player_color", options_for_select([ "Random", "White", "Black" ], "Random") %>
+				<% end %>
+			</div>
+
+		<% else %>
+
+			<div>Hosted by <strong><%= @lobby.host.email %></strong></div>
+			<% if @player_color == 0 %>
+				<div><%= link_to "Start game", games_path(host_is: "random", lobby_host: @lobby.host.id, nonhost: current_user.id), method: :post %></div>
+			<% elsif @player_color == 1 %>
+				<div><%= link_to "Start game as white", games_path(host_is: "black", lobby_host: @lobby.host.id, nonhost: current_user.id), method: :post %></div>
+			<% else %>
+				<div><%= link_to "Start game as black", games_path(host_is: "white", lobby_host: @lobby.host.id, nonhost: current_user.id), method: :post %></div>
+			<% end %>
+
+		<% end %>
+
+
+	<% else %>
+
+		<h1>This lobby does not exist</h1>
+
+	<% end %>
+
+	<%= render "layouts/back_home" %>
+</div>

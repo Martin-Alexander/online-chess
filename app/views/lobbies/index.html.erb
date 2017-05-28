@@ -1,19 +1,14 @@
-<% @games.each do |game| %>
+<div class="my-wrapper">
+	<% if @lobbies.empty? %>
+		<div class="choose-an-opponent">
+			<div>No games in the lobby...</div>
+			<div><%= link_to "Create one!", lobbies_path, method: :post %></div>
+		</div>
+	<% else %>
+		<% @lobbies.each do |lobby| %>
+			<div><%= link_to "#{lobby.name}", lobby_path(lobby) %></div>
+		<% end %>
+	<% end %>
 
-	<div>Host: <%= game.white.email %></div>
-	<div>Game id: <%= game.id %></div>
-	<div><%= link_to "Show", show_path(game) %></div>
-
-<% end %>
-
-<% if @games.empty? %>
-	<div class="choose-an-opponent">
-		<div>No games in the lobby...</div>
-		<div><%= link_to "Create one!", lobbies_path, method: :post %></div>
-	</div>
-<% end %>
-<%= link_to home_path do %>
-	<div class="back-home-button chess-btn">
-		Go Back Home
-	</div>
-<% end %>
+	<%= render "layouts/back_home" %>
+</div>

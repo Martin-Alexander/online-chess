@@ -3,6 +3,6 @@
   <div class="turn-player">
     <%= @white_to_move ? "White" : "Black" %> to move
   </div>
-  <div>Black: <%= @black_player.email rescue "" %></div>
-  <div>White: <%= @white_player.email rescue "" %></div>
+  <div>Black: <%= @game.black.email rescue "" %></div>
+  <div>White: <%= @game.white.email rescue "" %></div>
 </div>

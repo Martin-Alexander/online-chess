@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170528024728) do
+ActiveRecord::Schema.define(version: 20170528065056) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,6 +41,8 @@ ActiveRecord::Schema.define(version: 20170528024728) do
     t.bigint "nonhost_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "name"
+    t.integer "player_color"
     t.index ["host_id"], name: "index_lobbies_on_host_id"
     t.index ["nonhost_id"], name: "index_lobbies_on_nonhost_id"
   end

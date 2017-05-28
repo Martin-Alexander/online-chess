@@ -3,10 +3,6 @@ class Game < ApplicationRecord
   belongs_to :white, class_name: "User", optional: true
   has_many :boards, dependent: :destroy
 
-  def full?
-  	white && black
-  end
-
   def game_over?
 		self.boards.last.moves.zero?  	
   end
