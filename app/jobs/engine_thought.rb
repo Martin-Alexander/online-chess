@@ -128,7 +128,7 @@ class EngineThought < ApplicationJob
 
   def mamaburger(initial_board, current_game)
   	move_evaluations = tree_evaluator(deep_thought(initial_board))
-  	puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
+  	# puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
   	best_move_index = move_evaluations.each_with_index.max[1]
   	computer_move_board = initial_board.move(initial_board.moves[best_move_index])
   	computer_move_board.game = current_game
@@ -163,37 +163,52 @@ class EngineThought < ApplicationJob
   end
 
 	def deep_thought(board_object)
+		
+		reader, writer = IO.pipe
+		tree = []
   	start_time = Time.now
-	  tree = []
 	  board_object.moves.each_with_index do |move_one, i|
-    	puts "#{((i / (board_object.moves.length * 1.00)) * 100).round}%" 
-      branch_one = []
-      first_level_board = board_object.computer_move(move_one)
-      first_level_board_moves = first_level_board.moves
-	    if first_level_board_moves.empty?
-	      tree << [[999]]
-	    else
-	      tree << branch_one
-	      first_level_board_moves.each do |move_two|
-	        branch_two = []
-	        second_level_board = first_level_board.computer_move(move_two)
-	        second_level_board_moves = second_level_board.moves
-	        if second_level_board_moves.empty?
-            branch_one << [-999]
-	        else
-	          branch_one << branch_two
-	          second_level_board_moves.each do |move_three|
-	            third_level_board = second_level_board.computer_move(move_three)
-              board_eval = static_board_evaluation(third_level_board.board_data.to_board)
-							board_object.white_to_move ? branch_two <<  board_eval : branch_two << 0 - board_eval
-	          end
-	        end
-	      end
-	    end
+	  	fork do
+	    	# puts "#{((i / (board_object.moves.length * 1.00)) * 100).round}%" 
+	      branch_one = []
+	      first_level_board = board_object.computer_move(move_one)
+	      first_level_board_moves = first_level_board.moves
+		    if first_level_board_moves.empty?
+		    	tree << [[999]]
+		    else
+		    	tree << branch_one
+		      first_level_board_moves.each do |move_two|
+		        branch_two = []
+		        second_level_board = first_level_board.computer_move(move_two)
+		        second_level_board_moves = second_level_board.moves
+		        if second_level_board_moves.empty?
+	            branch_one << [-999]
+		        else
+		          branch_one << branch_two
+		          second_level_board_moves.each do |move_three|
+		            third_level_board = second_level_board.computer_move(move_three)
+	              board_eval = static_board_evaluation(third_level_board.board_data.to_board)
+								board_object.white_to_move ? branch_two <<  board_eval : branch_two << 0 - board_eval
+		          end
+		        end
+		      end
+		    end
+				writer.write "#{tree_evaluator_helper(branch_one, 0).min}Q #{i},"
+			end
 	  end
+
+	  Process.wait
+
     end_time = Time.now
-    puts "#{tree.flatten.length} boards evaluated in #{(end_time - start_time) / 60.0} minutes"
-    return tree
+    # puts "#{tree.flatten.length} boards evaluated in #{(end_time - start_time) / 60.0} minutes"
+
+		writer.close
+		prep = reader.read.split(",").each { |i| i.to_i }
+		prep.map! { |i| i.split("Q") }
+		prep.map! { |i| [i[0], i[1].to_i] }
+		prep.sort_by! { |i| i[1] }
+		prep.map! { |i| i[0].to_f }
+		prep
   end
 
 
