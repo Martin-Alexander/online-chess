@@ -191,6 +191,7 @@ class EngineThought < ApplicationJob
 		        end
 		      end
 		    end
+		    puts "Process ##{$$}"
 				child.send "#{tree_evaluator_helper(branch_one, 0).min}Q #{i},", 0
 			end
 	  end
