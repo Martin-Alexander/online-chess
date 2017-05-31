@@ -166,18 +166,15 @@ class EngineThought < ApplicationJob
 		
 		require 'socket'
 		parent, child = UNIXSocket.pair
-		tree = []
   	start_time = Time.now
 	  board_object.moves.each_with_index do |move_one, i|
 	  	fork_with_new_connection do
-	    	# puts "#{((i / (board_object.moves.length * 1.00)) * 100).round}%" 
 	      branch_one = []
 	      first_level_board = board_object.computer_move(move_one)
 	      first_level_board_moves = first_level_board.moves
 		    if first_level_board_moves.empty?
-		    	tree << [[999]]
+		    	child.send "999Q #{i},"
 		    else
-		    	tree << branch_one
 		      first_level_board_moves.each do |move_two|
 		        branch_two = []
 		        second_level_board = first_level_board.computer_move(move_two)
@@ -201,7 +198,6 @@ class EngineThought < ApplicationJob
 	  Process.waitall
 
     end_time = Time.now
-    # puts "#{tree.flatten.length} boards evaluated in #{(end_time - start_time) / 60.0} minutes"
     prep = parent.recv(11111111)
 		prep = prep.split(",").each { |i| i.to_i }
 		prep.map! { |i| i.split("Q") }
