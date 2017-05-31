@@ -164,11 +164,12 @@ class EngineThought < ApplicationJob
 
 	def deep_thought(board_object)
 		
-		reader, writer = IO.pipe
+		require 'socket'
+		parent, child = UNIXSocket.pair
 		tree = []
   	start_time = Time.now
 	  board_object.moves.each_with_index do |move_one, i|
-	  	fork do
+	  	fork_with_new_connection do
 	    	# puts "#{((i / (board_object.moves.length * 1.00)) * 100).round}%" 
 	      branch_one = []
 	      first_level_board = board_object.computer_move(move_one)
@@ -193,17 +194,16 @@ class EngineThought < ApplicationJob
 		        end
 		      end
 		    end
-				writer.write "#{tree_evaluator_helper(branch_one, 0).min}Q #{i},"
+				child.send "#{tree_evaluator_helper(branch_one, 0).min}Q #{i},", 0
 			end
 	  end
 
-	  Process.wait
+	  Process.waitall
 
     end_time = Time.now
     # puts "#{tree.flatten.length} boards evaluated in #{(end_time - start_time) / 60.0} minutes"
-
-		writer.close
-		prep = reader.read.split(",").each { |i| i.to_i }
+    prep = parent.recv(11111111)
+		prep = prep.split(",").each { |i| i.to_i }
 		prep.map! { |i| i.split("Q") }
 		prep.map! { |i| [i[0], i[1].to_i] }
 		prep.sort_by! { |i| i[1] }
@@ -227,4 +227,40 @@ class EngineThought < ApplicationJob
 	def tree_evaluator(list)
 	  tree_evaluator_helper(list, 1)
 	end
+
+  def fork_with_new_connection
+    # Store the ActiveRecord connection information
+    config = ActiveRecord::Base.remove_connection
+
+    pid = fork do
+      # tracking if the op failed for the Process exit
+      success = true
+
+      begin
+        ActiveRecord::Base.establish_connection(config)
+        
+        # This is needed to re-initialize the random number generator after forking (if you want diff random numbers generated in the forks)
+        srand
+
+        # Run the closure passed to the fork_with_new_connection method
+        yield
+
+      rescue Exception => exception
+        puts ("Forked operation failed with exception: " + exception)
+        
+        # the op failed, so note it for the Process exit
+        success = false
+
+      ensure
+        ActiveRecord::Base.remove_connection
+        Process.exit! success
+      end
+    end
+
+    # Restore the ActiveRecord connection information
+    ActiveRecord::Base.establish_connection(config)
+
+    #return the process id
+    pid
+  end
 end
