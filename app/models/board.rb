@@ -63,9 +63,9 @@ class Board < ApplicationRecord
       new_castling[0] = "0"
     elsif move.start_square == [7, 0] || move.end_square == [7, 0]
       new_castling[1] = "0"
-    elsif move.start_square == [0, 0] || move.end_square == [0, 0]
-      new_castling[2] = "0"
     elsif move.start_square == [0, 7] || move.end_square == [0, 7]
+      new_castling[2] = "0"
+    elsif move.start_square == [0, 0] || move.end_square == [0, 0]
       new_castling[3] = "0"
     end
     return new_castling
