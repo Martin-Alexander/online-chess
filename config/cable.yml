@@ -5,7 +5,8 @@ redis: &redis
 development: &redis
 production: 
   adapter: redis
-  url: redis://h:p4d50aab7289cc7077a93e81f6284b94803d6786aa3f71f53aac9693d40d10b6f@ec2-34-206-56-30.compute-1.amazonaws.com:54689
+  # url: redis://h:p4d50aab7289cc7077a93e81f6284b94803d6786aa3f71f53aac9693d40d10b6f@ec2-34-206-56-30.compute-1.amazonaws.com:54689 OLD
+  url: redis://h:pdd57ec24c4d81aaa240be97d3f6bf8b19b3b675bfa10b0dd7416e4a4a1de4ead@ec2-34-206-56-30.compute-1.amazonaws.com:55689
 test:
   adapter: async
 
