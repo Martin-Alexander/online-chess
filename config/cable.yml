@@ -5,7 +5,7 @@ redis: &redis
 development: &redis
 production: 
   adapter: redis
-  url: redis://rediscloud:ZozVMqazFGzVNUwZ@redis-16021.c14.us-east-1-2.ec2.cloud.redislabs.com:16021
+  url: redis://h:pdd57ec24c4d81aaa240be97d3f6bf8b19b3b675bfa10b0dd7416e4a4a1de4ead@ec2-34-206-56-30.compute-1.amazonaws.com:55689
 test:
   adapter: async
 
