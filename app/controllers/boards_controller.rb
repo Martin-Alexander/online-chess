@@ -39,6 +39,7 @@ class BoardsController < ApplicationController
 	def game_broadcast(board, game)
 		ActionCable.server.broadcast "game_channel", {
 			board_data: board.board_data,
+			board_id: board.id,
 			white_to_move: board.white_to_move,
 			game_id: game.id.to_s
 		}
