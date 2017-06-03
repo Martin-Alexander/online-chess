@@ -1,5 +1,10 @@
 <div id="lower-menu" class="std-box">
   <div><%= link_to "Go back home", home_path %></div>
+  <% if @game.black == current_user %>
+	  <div>Plaing as <strong>black</strong></div>
+  <% elsif @game.white == current_user %>
+	  <div>Plaing as <strong>white</strong></div>
+  <% end %>
   <div class="turn-player">
     <%= @white_to_move ? "White" : "Black" %> to move
   </div>
