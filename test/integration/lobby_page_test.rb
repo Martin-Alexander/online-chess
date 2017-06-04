@@ -7,8 +7,7 @@ class LobbyPageTest < ActionDispatch::IntegrationTest
   end
 
   test "correctly displays no lobbies" do
-  	visit "/lobbies"
-
+    visit "/lobbies"
   	if Lobby.count.zero?
   		assert page.has_content? "No games in the lobby..."
   	end
@@ -16,7 +15,6 @@ class LobbyPageTest < ActionDispatch::IntegrationTest
 
   test "correctly displays lobbies" do
 		Lobby.create host: User.find_by(email: "martin"), nonhost: User.find_by(email: "player_two"), name: "Test Lobby"
-
   	visit "/lobbies"
 		assert page.has_content? "Test Lobby"
   end

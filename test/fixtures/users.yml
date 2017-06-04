@@ -5,3 +5,7 @@ martin:
 player_two:
   email: "player_two"
   human: true
+
+babyburger:
+  email: "babyburger"
+  human: false
