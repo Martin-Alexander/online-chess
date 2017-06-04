@@ -163,37 +163,48 @@ class EngineThought < ApplicationJob
   end
 
 	def deep_thought(board_object)
+		
+		require 'socket'
+		parent, child = UNIXSocket.pair
   	start_time = Time.now
-	  tree = []
 	  board_object.moves.each_with_index do |move_one, i|
-    	puts "#{((i / (board_object.moves.length * 1.00)) * 100).round}%" 
-      branch_one = []
-      first_level_board = board_object.computer_move(move_one)
-      first_level_board_moves = first_level_board.moves
-	    if first_level_board_moves.empty?
-	      tree << [[999]]
-	    else
-	      tree << branch_one
-	      first_level_board_moves.each do |move_two|
-	        branch_two = []
-	        second_level_board = first_level_board.computer_move(move_two)
-	        second_level_board_moves = second_level_board.moves
-	        if second_level_board_moves.empty?
-            branch_one << [-999]
-	        else
-	          branch_one << branch_two
-	          second_level_board_moves.each do |move_three|
-	            third_level_board = second_level_board.computer_move(move_three)
-              board_eval = static_board_evaluation(third_level_board.board_data.to_board)
-							board_object.white_to_move ? branch_two <<  board_eval : branch_two << 0 - board_eval
-	          end
-	        end
-	      end
-	    end
+	  	fork_with_new_connection do
+	      branch_one = []
+	      first_level_board = board_object.computer_move(move_one)
+	      first_level_board_moves = first_level_board.moves
+		    if first_level_board_moves.empty?
+		    	child.send "999Q #{i},"
+		    else
+		      first_level_board_moves.each do |move_two|
+		        branch_two = []
+		        second_level_board = first_level_board.computer_move(move_two)
+		        second_level_board_moves = second_level_board.moves
+		        if second_level_board_moves.empty?
+	            branch_one << [-999]
+		        else
+		          branch_one << branch_two
+		          second_level_board_moves.each do |move_three|
+		            third_level_board = second_level_board.computer_move(move_three)
+	              board_eval = static_board_evaluation(third_level_board.board_data.to_board)
+								board_object.white_to_move ? branch_two <<  board_eval : branch_two << 0 - board_eval
+		          end
+		        end
+		      end
+		    end
+				child.send "#{tree_evaluator_helper(branch_one, 0).min}Q #{i},", 0
+			end
 	  end
+
+	  Process.waitall
+
     end_time = Time.now
-    puts "#{tree.flatten.length} boards evaluated in #{(end_time - start_time) / 60.0} minutes"
-    return tree
+    prep = parent.recv(11111111)
+		prep = prep.split(",").each { |i| i.to_i }
+		prep.map! { |i| i.split("Q") }
+		prep.map! { |i| [i[0], i[1].to_i] }
+		prep.sort_by! { |i| i[1] }
+		prep.map! { |i| i[0].to_f }
+		prep
   end
 
 
@@ -212,4 +223,40 @@ class EngineThought < ApplicationJob
 	def tree_evaluator(list)
 	  tree_evaluator_helper(list, 1)
 	end
+
+  def fork_with_new_connection
+    # Store the ActiveRecord connection information
+    config = ActiveRecord::Base.remove_connection
+
+    pid = fork do
+      # tracking if the op failed for the Process exit
+      success = true
+
+      begin
+        ActiveRecord::Base.establish_connection(config)
+        
+        # This is needed to re-initialize the random number generator after forking (if you want diff random numbers generated in the forks)
+        srand
+
+        # Run the closure passed to the fork_with_new_connection method
+        yield
+
+      rescue Exception => exception
+        puts ("Forked operation failed with exception: " + exception)
+        
+        # the op failed, so note it for the Process exit
+        success = false
+
+      ensure
+        ActiveRecord::Base.remove_connection
+        Process.exit! success
+      end
+    end
+
+    # Restore the ActiveRecord connection information
+    ActiveRecord::Base.establish_connection(config)
+
+    #return the process id
+    pid
+  end
 end
