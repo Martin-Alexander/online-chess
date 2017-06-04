@@ -128,7 +128,7 @@ class EngineThought < ApplicationJob
 
   def mamaburger(initial_board, current_game)
   	move_evaluations = tree_evaluator(deep_thought(initial_board))
-  	# puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
+  	puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
   	best_move_index = move_evaluations.each_with_index.max[1]
   	computer_move_board = initial_board.move(initial_board.moves[best_move_index])
   	computer_move_board.game = current_game
@@ -191,7 +191,6 @@ class EngineThought < ApplicationJob
 		        end
 		      end
 		    end
-		    puts "Process ##{$$}"
 				child.send "#{tree_evaluator_helper(branch_one, 0).min}Q #{i},", 0
 			end
 	  end
