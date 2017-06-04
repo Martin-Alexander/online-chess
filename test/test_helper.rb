@@ -20,8 +20,8 @@ class ActionDispatch::IntegrationTest
   end
 end
 
-# require 'capybara/poltergeist'
-# Capybara.default_driver = :poltergeist
+require 'capybara/poltergeist'
+Capybara.default_driver = :poltergeist
 
 include Warden::Test::Helpers
 Warden.test_mode!
