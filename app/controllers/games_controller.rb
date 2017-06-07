@@ -24,8 +24,7 @@ class GamesController < ApplicationController
         create_game.call(nonhost, host)
       end
     end
-
-    Board.create(game: new_game)
+    
     redirect_to game_path(new_game)
   end
 
