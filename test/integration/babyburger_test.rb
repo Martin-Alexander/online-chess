@@ -10,7 +10,6 @@ class BabyburgerTest < ActionDispatch::IntegrationTest
 	test "can view new game" do 
 		login_as users(:martin)
 		test_game = Game.create(white: User.find_by(email: "martin"), black: User.find_by(email: "babyburger"))
-		Board.create(game: test_game)
 		visit "/games/#{test_game.id}"
 
 		assert_equal 200, page.status_code
