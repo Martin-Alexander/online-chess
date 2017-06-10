@@ -137,17 +137,39 @@ class Board < ApplicationRecord
         safety = false
         throw :king_safety
       end
-      each_square do |rank, file|
-        if ["rook", "bishop", "queen"].include?(test_board[rank][file].piece) &&
-          test_board[rank][file].color == right_color
-          naive_moves(rank, file, test_board).each do |enemy_move|
-            if enemy_move.end_square == king_location
-              safety = false
-              throw :king_safety
-            end
-          end
+
+      rank = king_location[0]
+      file = king_location[1]
+
+      variables = [
+        [-1, 0, rank, "rook"],
+        [1, 0, 7 - rank, "rook"],
+        [0, -1, file, "rook"], 
+        [0, 1, 7 - file, "rook"], 
+        [-1, 1, [rank, 7 - file].min, "bishop"], 
+        [-1, -1, [rank, file].min, "bishop"], 
+        [1, -1, [7 - rank, file].min, "bishop"], 
+        [1, 1, [7 - rank, 7 - file].min, "bishop"]
+      ]
+
+      variables.each do |var|
+        unless king_safety_scan?(var[0], var[1], var[2], rank, file, test_board, var[3])
+          safety = false
+          throw :king_safety
         end
       end
+
+      # each_square do |rank, file|
+      #   if ["rook", "bishop", "queen"].include?(test_board[rank][file].piece) &&
+      #     test_board[rank][file].color == right_color
+      #     naive_moves(rank, file, test_board).each do |enemy_move|
+      #       if enemy_move.end_square == king_location
+      #         safety = false
+      #         throw :king_safety
+      #       end
+      #     end
+      #   end
+      # end
     end
     return safety
   end
@@ -338,6 +360,8 @@ class Board < ApplicationRecord
       square = board[rank + increment * rank_mod][file + increment * file_mod]
       if square.color != king.color && (square.piece == "queen" || square.piece == threat_piece)
         result = false
+        break
+      elsif square != 0
         break
       end
     end
