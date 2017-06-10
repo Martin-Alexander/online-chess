@@ -30,7 +30,7 @@ class GamesController < ApplicationController
 
   def show
     @game = Game.find(params[:id])
-    @board = @game.boards.last
+    @board = @game.current_board
 
     if @board.turn_player && !@board.turn_player.human && @board.ply == 1 
       # Automatically run EngineThought if it's the first ply and the turnplayer is a computer
