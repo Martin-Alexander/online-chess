@@ -127,16 +127,18 @@ class EngineThought < ApplicationJob
   end
 
   def mamaburger(initial_board, current_game)
-    move_evaluations = tree_evaluator(deep_thought(initial_board))
-    exit if move_evaluations.empty?
-    puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
-    best_move_index = move_evaluations.each_with_index.max[1]
-    computer_move_board = initial_board.move(initial_board.moves[best_move_index])
-    computer_move_board.game = current_game
-    computer_move_board.save!
-    puts "In Check: #{computer_move_board.check?}"
-    puts "Checkmate: #{computer_move_board.check_mate?}"
-    send_back_board(computer_move_board, current_game)
+    if initial_board.moves.empty?
+      puts "Game over"
+      initial_board.check_mate? ? puts "Checkmate" : puts "Stalemate"
+    else
+      move_evaluations = tree_evaluator(deep_thought(initial_board))
+      best_move_index = move_evaluations.each_with_index.max[1]
+      computer_move_board = initial_board.move(initial_board.moves[best_move_index])
+      computer_move_board.game = current_game
+      computer_move_board.save!
+      puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
+      send_back_board(computer_move_board, current_game)
+    end
   end
 
   # ============ HELPER METHODS ============
