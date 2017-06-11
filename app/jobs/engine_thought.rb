@@ -129,7 +129,11 @@ class EngineThought < ApplicationJob
   def mamaburger(initial_board, current_game)
     if initial_board.moves.empty?
       puts "Game over"
-      initial_board.check_mate? ? puts "Checkmate" : puts "Stalemate"
+      if initial_board.check_mate?
+        puts "Checkmate"
+      else
+        puts "Stalemate"
+      end
     else
       move_evaluations = tree_evaluator(deep_thought(initial_board))
       best_move_index = move_evaluations.each_with_index.max[1]
