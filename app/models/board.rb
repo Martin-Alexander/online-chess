@@ -49,17 +49,12 @@ class Board < ApplicationRecord
     end
   end
 
-<<<<<<< HEAD
-  def check?
-    king_safe?(board_data)
-=======
   def check_mate?
     check? && moves.empty?
   end
 
   def check?
     !king_safe?(board_data.to_board)
->>>>>>> 559ac0afc739845bea46418e88c2c4c263ded5fc
   end
 
   private
