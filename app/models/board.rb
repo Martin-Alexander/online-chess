@@ -170,10 +170,6 @@ class Board < ApplicationRecord
     return safety
   end
 
-  def check_mate?(board)
-    king_location = find_king(board)
-  end
-
   def local_threats_to_king?(test_board, rank, file)
     threat = false
     catch :king_safety do
