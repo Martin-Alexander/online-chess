@@ -49,8 +49,12 @@ class Board < ApplicationRecord
     end
   end
 
+  def check_mate?
+    check? && moves.empty?
+  end
+
   def check?
-    king_safe?(board_data)
+    !king_safe?(board_data.to_board)
   end
 
   private
@@ -164,10 +168,6 @@ class Board < ApplicationRecord
 
     end
     return safety
-  end
-
-  def check_mate?(board)
-    king_location = find_king(board)
   end
 
   def local_threats_to_king?(test_board, rank, file)
