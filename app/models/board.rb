@@ -28,7 +28,7 @@ class Board < ApplicationRecord
         naive_moves = naive_moves(rank, file, board_data.to_board)
         if !naive_moves.nil?
           naive_moves.each do |naive_move|
-            if king_safe?(naive_move)
+            if king_safe?(execute_move(board_data.to_board, naive_move))
               output << naive_move
             end
           end
@@ -47,6 +47,10 @@ class Board < ApplicationRecord
       row.each { |square| print square < 0 ? "#{square} " : " #{square} " }
       puts
     end
+  end
+
+  def check?
+    king_safe?(board_data)
   end
 
   private
@@ -127,13 +131,12 @@ class Board < ApplicationRecord
     board_data.to_board[rank][file].color == right_color
   end
 
-  def king_safe?(move)
+  def king_safe?(board)
     right_color = white_to_move ? "black" : "white"
-    test_board = execute_move(board_data.to_board, move)
-    king_location = find_king(test_board)
+    king_location = find_king(board)
     safety = true
     catch :king_safety do
-      if local_threats_to_king?(test_board, king_location[0], king_location[1])
+      if local_threats_to_king?(board, king_location[0], king_location[1])
         safety = false
         throw :king_safety
       end
@@ -153,25 +156,18 @@ class Board < ApplicationRecord
       ]
 
       variables.each do |var|
-        unless king_safety_scan?(var[0], var[1], var[2], rank, file, test_board, var[3])
+        unless king_safety_scan?(var[0], var[1], var[2], rank, file, board, var[3])
           safety = false
           throw :king_safety
         end
       end
 
-      # each_square do |rank, file|
-      #   if ["rook", "bishop", "queen"].include?(test_board[rank][file].piece) &&
-      #     test_board[rank][file].color == right_color
-      #     naive_moves(rank, file, test_board).each do |enemy_move|
-      #       if enemy_move.end_square == king_location
-      #         safety = false
-      #         throw :king_safety
-      #       end
-      #     end
-      #   end
-      # end
     end
     return safety
+  end
+
+  def check_mate?(board)
+    king_location = find_king(board)
   end
 
   def local_threats_to_king?(test_board, rank, file)
