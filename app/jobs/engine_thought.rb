@@ -133,6 +133,7 @@ class EngineThought < ApplicationJob
     computer_move_board = initial_board.move(initial_board.moves[best_move_index])
     computer_move_board.game = current_game
     computer_move_board.save!
+    puts "In Check: #{computer_move_board.check?}"
     send_back_board(computer_move_board, current_game)
   end
 
