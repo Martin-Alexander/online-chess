@@ -201,7 +201,7 @@ class EngineThought < ApplicationJob
       end
     end
     end_time = Time.now
-    puts "#{tree.flatten.length} boards evaluated in #{(end_time - start_time)"
+    puts "#{tree.flatten.length} boards evaluated"
     return tree
   end
 
