@@ -1,5 +1,5 @@
 class EngineThought < ApplicationJob
-
+  require 'socket'
   queue_as :default
 
   Fixnum.send(:include, ChessPiece)
@@ -135,7 +135,7 @@ class EngineThought < ApplicationJob
         puts "Stalemate"
       end
     else
-      move_evaluations = deep_thought(initial_board)
+      move_evaluations = deeper_thought(initial_board)
       best_move_index = move_evaluations.each_with_index.max[1]
       computer_move_board = initial_board.move(initial_board.moves[best_move_index])
       computer_move_board.game = current_game
@@ -171,11 +171,9 @@ class EngineThought < ApplicationJob
     return total_material_score
   end
 
-  def deep_thought(board_object)
+  def smart_though(board_object)
     
-    require 'socket'
     parent, child = UNIXSocket.pair
-    start_time = Time.now
     board_object.moves.each_with_index do |move_one, i|
       fork_with_new_connection do
         branch_one = []
@@ -217,16 +215,102 @@ class EngineThought < ApplicationJob
     Process.waitall
 
     end_time = Time.now
-    prep = parent.recv(10000)
-
-    prep = prep.split(",").each { |i| i.to_i }
-    prep.map! { |i| i.split("Q") }
-    prep.map! { |i| [i[0], i[1].to_i] }
-    prep.sort_by! { |i| i[1] }
-    prep.map! { |i| i[0].to_f }
-    prep
+    move_tree_parser parent.recv(10000)
   end
 
+  def deeper_thought(board_object)
+    
+    parent, child = UNIXSocket.pair
+    board_object.moves.each_with_index do |move_one, i|
+      fork_with_new_connection do
+        branch_one = []
+        first_level_board = board_object.computer_move(move_one)
+        first_level_board_moves = first_level_board.moves
+        if first_level_board_moves.empty?
+          child.send "999Q #{i},", 0
+        else
+          first_level_board_moves.each do |move_two|
+            branch_two = []
+            second_level_board = first_level_board.computer_move(move_two)
+            second_level_board_moves = second_level_board.moves
+            if second_level_board_moves.empty?
+              branch_one << [[-999]]
+            else
+              branch_one << branch_two
+              second_level_board_moves.each do |move_three|
+                branch_three = []
+                third_level_board = second_level_board.computer_move(move_three)
+                third_level_board_moves = third_level_board.moves
+                if third_level_board_moves.empty?
+                  branch_two << [999]
+                else
+                  branch_two << branch_three
+                  third_level_board_moves.each do |move_four|
+                    fourth_level_board = third_level_board.computer_move(move_four)
+                    board_eval = static_board_evaluation(fourth_level_board.board_data.to_board)
+                    board_object.white_to_move ? branch_three <<  board_eval : branch_three << 0 - board_eval
+                  end
+                end
+              end
+            end
+          end
+          child.send "#{tree_evaluator_helper(branch_one, 0).min}Q #{i},", 0
+        end
+      end
+    end
+
+    Process.waitall
+
+    end_time = Time.now
+    move_tree_parser parent.recv(10000)
+  end
+
+
+  def deep_thought(board_object)
+    
+    parent, child = UNIXSocket.pair
+    board_object.moves.each_with_index do |move_one, i|
+      fork_with_new_connection do
+        branch_one = []
+        first_level_board = board_object.computer_move(move_one)
+        first_level_board_moves = first_level_board.moves
+        if first_level_board_moves.empty?
+          child.send "999Q #{i},", 0
+        else
+          first_level_board_moves.each do |move_two|
+            branch_two = []
+            second_level_board = first_level_board.computer_move(move_two)
+            second_level_board_moves = second_level_board.moves
+            if second_level_board_moves.empty?
+              branch_one << [-999]
+            else
+              branch_one << branch_two
+              second_level_board_moves.each do |move_three|
+                third_level_board = second_level_board.computer_move(move_three)
+                board_eval = static_board_evaluation(third_level_board.board_data.to_board)
+                board_object.white_to_move ? branch_two <<  board_eval : branch_two << 0 - board_eval
+              end
+            end
+          end
+          child.send "#{tree_evaluator_helper(branch_one, 0).min}Q #{i},", 0
+        end
+      end
+    end
+
+    Process.waitall
+
+    end_time = Time.now
+    move_tree_parser parent.recv(10000)
+  end
+
+  def move_tree_parser(move_tree)
+    move_tree = move_tree.split(",").each { |i| i.to_i }
+    move_tree.map! { |i| i.split("Q") }
+    move_tree.map! { |i| [i[0], i[1].to_i] }
+    move_tree.sort_by! { |i| i[1] }
+    move_tree.map! { |i| i[0].to_f }
+    move_tree
+  end
 
   def tree_evaluator_helper(list, level)
     if list.all? { |i| i.kind_of?(Array) }
