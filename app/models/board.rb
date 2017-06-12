@@ -229,36 +229,36 @@ class Board < ApplicationRecord
     v_direction = piece > 0 ? -1 : 1
     if !board[rank + 1 * v_direction].nil? &&
       board[rank + 1 * v_direction][file].zero? &&
-      output << pawn_move_builder([rank, file], [rank + 1 * v_direction, file], piece)
+      output << pawn_move_builder([rank, file], [rank + 1 * v_direction, file], piece, false)
       if !board[rank + 2 * v_direction].nil? &&
         board[rank + 2 * v_direction][file].zero? &&
         ((rank == 1 && piece.color == "black") || (rank == 6 && piece.color == "white"))
-        output << pawn_move_builder([rank, file], [rank + 2 * v_direction, file], piece)
+        output << pawn_move_builder([rank, file], [rank + 2 * v_direction, file], piece, false)
       end
     end
     if !board[rank + 1 * v_direction].nil? &&
       !board[rank + 1 * v_direction][file - 1].nil? &&
       !(board[rank + 1 * v_direction][file - 1]).zero? &&
       piece.color != board[rank + 1 * v_direction][file - 1].color
-      output << pawn_move_builder([rank, file], [rank + 1 * v_direction, file - 1], piece)
+      output << pawn_move_builder([rank, file], [rank + 1 * v_direction, file - 1], piece, false)
     end
-    if !board[rank + 1 * v_direction].nil? &&
+    if !board[rank + 1 * v_direction].nil? &&pawn_move_builder
       !board[rank + 1 * v_direction][file + 1].nil? &&
       !(board[rank + 1 * v_direction][file + 1]).zero? &&
       piece.color != board[rank + 1 * v_direction][file + 1].color
-      output << pawn_move_builder([rank, file], [rank + 1 * v_direction, file + 1], piece)
+      output << pawn_move_builder([rank, file], [rank + 1 * v_direction, file + 1], piece, false)
     end
     remove_out_of_bounds(output.flatten)
   end
 
-  def pawn_move_builder(start_square, end_square, piece)
+  def pawn_move_builder(start_square, end_square, piece, capture)
     output = []
     if piece.color == "white" && end_square[0] == 0
-      [2, 3, 4, 5].each { |i| output << Move.new(start_square, end_square, promotion: i) } 
+      [2, 3, 4, 5].each { |i| output << Move.new(start_square, end_square, promotion: i, capture: capture) } 
     elsif piece.color == "black" && end_square[0] == 7
-      [2, 3, 4, 5].each { |i| output << Move.new(start_square, end_square, promotion: i) }
+      [2, 3, 4, 5].each { |i| output << Move.new(start_square, end_square, promotion: i, capture: capture) }
     else 
-      output << Move.new(start_square, end_square)
+      output << Move.new(start_square, end_square, capture: capture)
     end
     return output
   end
@@ -269,25 +269,28 @@ class Board < ApplicationRecord
     [-1, 0, 1].each do |rank_inc|
       [-1, 0, 1].each do |file_inc|
         if !(rank_inc.zero? && file_inc.zero?) &&
-          !board[rank + rank_inc].nil? && !board[rank + rank_inc][file + file_inc].nil? &&
-          !(piece.color == board[rank + rank_inc][file + file_inc].color)
-          output << Move.new([rank, file], [rank + rank_inc, file + file_inc])
+          !board[rank + rank_inc].nil? && !board[rank + rank_inc][file + file_inc].nil?
+          if board[rank + rank_inc][file + file_inc].zero
+            output << Move.new([rank, file], [rank + rank_inc, file + file_inc], capture: false)
+          elsif !(piece.color == board[rank + rank_inc][file + file_inc].color)
+            output << Move.new([rank, file], [rank + rank_inc, file + file_inc], capture: true)
+          end
         end
       end
     end
     if piece.color == "white"
       if castling[0].to_i == 1 && board[7][5].zero? && board[7][6].zero?
-        output << Move.new([rank, file], [7, 6])
+        output << Move.new([rank, file], [7, 6], capture: false)
       end
       if castling[1].to_i == 1 && board[7][3].zero? && board[7][2].zero? && board[7][1].zero?
-        output << Move.new([rank, file], [7, 2])
+        output << Move.new([rank, file], [7, 2], capture: false)
       end
     else
       if castling[2].to_i == 1 && board[0][5].zero? && board[0][6].zero?
-        output << Move.new([rank, file], [0, 6])
+        output << Move.new([rank, file], [0, 6], capture: false)
       end
       if castling[3].to_i == 1 && board[0][3].zero? && board[0][2].zero? && board[0][1].zero?
-        output << Move.new([rank, file], [0, 2])
+        output << Move.new([rank, file], [0, 2], capture: false)
       end
     end
     remove_out_of_bounds(output)
@@ -298,10 +301,12 @@ class Board < ApplicationRecord
     piece = board[rank][file]
     [[-2, 1], [-1, 2], [1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1]].each do |i|
       if !board[rank + i[0]].nil? &&
-        !board[rank + i[0]][file + i[1]].nil? &&
-        (board[rank + i[0]][file + i[1]].zero? ||
-        piece.color != board[rank + i[0]][file + i[1]].color)
-        output << Move.new([rank, file], [rank + i[0], file + i[1]])
+        !board[rank + i[0]][file + i[1]].nil?
+        if board[rank + i[0]][file + i[1]].zero?
+          output << Move.new([rank, file], [rank + i[0], file + i[1]], capture: false)
+        elsif piece.color != board[rank + i[0]][file + i[1]].color
+          output << Move.new([rank, file], [rank + i[0], file + i[1]], capture: true)
+        end
       end
     end
     remove_out_of_bounds(output)
@@ -337,11 +342,10 @@ class Board < ApplicationRecord
   def move_along(rank_mod, file_mod, sequence_builder, rank, file, output, board)
     piece = board[rank][file]
     (1..sequence_builder).each do |increment|
-      move = Move.new([rank, file], [rank + increment * rank_mod, file + increment * file_mod])
       if board[rank + increment * rank_mod][file + increment * file_mod].zero?
-        output << move
+        output << Move.new([rank, file], [rank + increment * rank_mod, file + increment * file_mod], capture: false)
       elsif board[rank + increment * rank_mod][file + increment * file_mod].color != piece.color
-        output << move
+        output << output << Move.new([rank, file], [rank + increment * rank_mod, file + increment * file_mod], capture: true)
         break
       else
         break
