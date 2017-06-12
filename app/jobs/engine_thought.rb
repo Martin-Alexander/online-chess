@@ -135,6 +135,44 @@ class EngineThought < ApplicationJob
         puts "Stalemate"
       end
     else
+      move_evaluations = deep_thought(initial_board)
+      best_move_index = move_evaluations.each_with_index.max[1]
+      computer_move_board = initial_board.move(initial_board.moves[best_move_index])
+      computer_move_board.game = current_game
+      computer_move_board.save!
+      puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
+      send_back_board(computer_move_board, current_game)
+    end
+  end
+
+  def papaburger(initial_board, current_game)
+    if initial_board.moves.empty?
+      puts "Game over"
+      if initial_board.check_mate?
+        puts "Checkmate"
+      else
+        puts "Stalemate"
+      end
+    else
+      move_evaluations = smart_thought(initial_board)
+      best_move_index = move_evaluations.each_with_index.max[1]
+      computer_move_board = initial_board.move(initial_board.moves[best_move_index])
+      computer_move_board.game = current_game
+      computer_move_board.save!
+      puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
+      send_back_board(computer_move_board, current_game)
+    end
+  end
+
+  def grandpaburger(initial_board, current_game)
+    if initial_board.moves.empty?
+      puts "Game over"
+      if initial_board.check_mate?
+        puts "Checkmate"
+      else
+        puts "Stalemate"
+      end
+    else
       move_evaluations = deeper_thought(initial_board)
       best_move_index = move_evaluations.each_with_index.max[1]
       computer_move_board = initial_board.move(initial_board.moves[best_move_index])
@@ -171,7 +209,7 @@ class EngineThought < ApplicationJob
     return total_material_score
   end
 
-  def smart_though(board_object)
+  def smart_thought(board_object)
     
     parent, child = UNIXSocket.pair
     board_object.moves.each_with_index do |move_one, i|
@@ -193,16 +231,21 @@ class EngineThought < ApplicationJob
               second_level_board_moves.each do |move_three|
                 branch_three = []
                 third_level_board = second_level_board.computer_move(move_three)
-                third_level_board_moves = third_level_board.moves
-                if third_level_board_moves.empty?
-                  branch_two << [999]
-                else
-                  branch_two << branch_three
-                  third_level_board_moves.each do |move_four|
-                    fourth_level_board = third_level_board.computer_move(move_four)
-                    board_eval = static_board_evaluation(fourth_level_board.board_data.to_board)
-                    board_object.white_to_move ? branch_three <<  board_eval : branch_three << 0 - board_eval
+                if move_three.capture
+                  third_level_board_moves = third_level_board.moves
+                  if third_level_board_moves.empty?
+                    branch_two << [999]
+                  else
+                    branch_two << branch_three
+                    third_level_board_moves.each do |move_four|
+                      fourth_level_board = third_level_board.computer_move(move_four)
+                      board_eval = static_board_evaluation(fourth_level_board.board_data.to_board)
+                      board_object.white_to_move ? branch_three <<  board_eval : branch_three << 0 - board_eval
+                    end
                   end
+                else
+                  board_eval = static_board_evaluation(third_level_board.board_data.to_board)
+                  board_object.white_to_move ? branch_two <<  board_eval : branch_two << 0 - board_eval                  
                 end
               end
             end
@@ -313,11 +356,11 @@ class EngineThought < ApplicationJob
   end
 
   def tree_evaluator_helper(list, level)
-    if list.all? { |i| i.kind_of?(Array) }
+    if list.any? { |i| i.kind_of?(Array) }
       if level % 2 == 0
-        return(list.map { |j| (tree_evaluator_helper(j, level + 1)).max })
+        return(list.map { |j| j.is_a?(Array) ? (tree_evaluator_helper(j, level + 1)).max : j })
       else
-        return(list.map { |j| (tree_evaluator_helper(j, level + 1)).min })
+        return(list.map { |j| j.is_a?(Array) ? (tree_evaluator_helper(j, level + 1)).min : j })
       end
     else
       return(list)  
