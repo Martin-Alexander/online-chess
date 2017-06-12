@@ -1,12 +1,12 @@
 class Move
 
-  attr_reader :start_square, :end_square, :promotion, :in_bounds, :is_capture
+  attr_reader :start_square, :end_square, :promotion, :in_bounds, :capture
   
   def initialize(start_square, end_square, params ={})
     @start_square = start_square
     @end_square = end_square
     @in_bounds = in_bounds?
-    @is_capture = is_capture
+    @capture = params[:capture]
     @promotion = params[:promotion] || 0
   end
 
