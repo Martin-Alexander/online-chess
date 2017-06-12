@@ -1,110 +1,142 @@
 <div class="my-wrapper">
-	<div class="new-game-container">
-		<div>
-			<div class="choose-an-opponent">
-				<em>Choose an AI Oppenent!</em>
-			</div>
-			<div id="engine-choice">
+  <div class="new-game-container">
+    <div>
+      <div class="choose-an-opponent">
+        <em>Choose an AI Oppenent!</em>
+      </div>
+      <div id="engine-choice">
 
-				<div class="choose-engine">
-					<div class="engine-name">
-						<i class="caret1 fa fa-caret-right"></i>Baby Burger
-					</div>
-					<div class="engine-description" style="display: none;">
-						<ul>
-							<li>Choose moves at random</li>
-							<li><strong>Quick:</strong> Makes moves almost instantly</li>
-						</ul>
-						<div id="babyburger" class="play-button chess-btn">
-							<div>PLAY</div>
-						</div>
-					</div>
-				</div>
+        <div class="choose-engine">
+          <div class="engine-name">
+            <i class="caret1 fa fa-caret-right"></i>Baby Burger
+          </div>
+          <div class="engine-description" style="display: none;">
+            <ul>
+              <li>Choose moves at random</li>
+              <li><strong>Very Quick:</strong> Makes moves almost instantly</li>
+            </ul>
+            <div id="babyburger" class="play-button chess-btn">
+              <div>PLAY</div>
+            </div>
+          </div>
+        </div>
 
-				<div class="choose-engine">
-					<div class="engine-name">
-						<i class="caret1 fa fa-caret-right"></i>Teen Burger
-					</div>		
-					<div class="engine-description" style="display: none;">
-						<ul>
-							<li>Evaluates moves based on piece positioning as well as the balance of material</li>
-							<li><strong>Short-sighted:</strong> Makes moves based on their most imediate consequences without concern for how his oppenent will respond </li>
-							<li><strong>Quick:</strong> Makes moves almost instantly</li>
-						</ul>
-						<div id="teenburger" class="play-button chess-btn">
-							<div>PLAY</div>
-						</div>
-					</div>	
-				</div>
+        <div class="choose-engine">
+          <div class="engine-name">
+            <i class="caret1 fa fa-caret-right"></i>Teen Burger
+          </div>    
+          <div class="engine-description" style="display: none;">
+            <ul>
+              <li>Evaluates moves based on piece positioning as well as the balance of material</li>
+              <li><strong>Short-sighted:</strong> Makes moves based on their most imediate consequences without concern for how his oppenent will respond </li>
+              <li><strong>Very Quick:</strong> Makes moves almost instantly</li>
+            </ul>
+            <div id="teenburger" class="play-button chess-btn">
+              <div>PLAY</div>
+            </div>
+          </div>  
+        </div>
 
-				<div class="choose-engine">
-					<div class="engine-name">
-						<i class="caret1 fa fa-caret-right"></i>Mama Burger		
-					</div>
-					<div class="engine-description" style="display: none;">
-						<ul>
-							<li>Evaluates moves based on piece positioning as well as the balance of material</li>
-							<li><strong>Thoughtful:</strong> Looks three turns (plies) into the future before each move</li>
-							<li><strong>Slow:</strong> Spends an average of 30 seconds calculating her next move</li>
-						</ul>
-						<div id="mamaburger" class="play-button chess-btn">
-							<div>PLAY</div>
-						</div>
-					</div>				
-				</div>
-				
-			</div>
-		</div>
-		<%= link_to home_path do %>
-			<div class="back-home-button chess-btn">
-				Go Back Home
-			</div>
-		<% end %>
-	</div>
+        <div class="choose-engine">
+          <div class="engine-name">
+            <i class="caret1 fa fa-caret-right"></i>Mama Burger   
+          </div>
+          <div class="engine-description" style="display: none;">
+            <ul>
+              <li>Evaluates moves based on piece positioning as well as the balance of material</li>
+              <li><strong>Thoughtful:</strong> Looks three turns (plies) into the future before each move</li>
+              <li><strong>Quick:</strong> Spends an average of 5 seconds calculating her next move</li>
+            </ul>
+            <div id="mamaburger" class="play-button chess-btn">
+              <div>PLAY</div>
+            </div>
+          </div>        
+        </div>
 
-	<div class="choose-color-modal-filter">
-		<div class="choose-color-modal">
-			<i id="close-modal" class="fa fa-times"></i>
-			<div id="choose-color-title">Play as...</div>
-			<div id="color-choices">
-				<div id="choose-white" class="choose-color"></div>
-				<div id="choose-black" class="choose-color"></div>
-			</div>
-		</div>
-	</div>
+        <div class="choose-engine">
+          <div class="engine-name">
+            <i class="caret1 fa fa-caret-right"></i>Papa Burger   
+          </div>
+          <div class="engine-description" style="display: none;">
+            <ul>
+              <li>Evaluates moves based on piece positioning as well as the balance of material</li>
+              <li><strong>Cautious:</strong> Has a variable depth of search. Will pay closer attention when moves involve capturing</li>
+              <li><strong>Slow:</strong> Spends an average of 30 seconds calculating his next move</li>
+            </ul>
+            <div id="papaburger" class="play-button chess-btn">
+              <div>PLAY</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="choose-engine">
+          <div class="engine-name">
+            <i class="caret1 fa fa-caret-right"></i>Grandpa Burger    
+          </div>
+          <div class="engine-description" style="display: none;">
+            <ul>
+              <li>Evaluates moves based on piece positioning as well as the balance of material</li>
+              <li><strong>Very Thoughtful:</strong> Looks four turns (plies) into the future before each move</li>
+              <li><strong>Very Slow:</strong> Spends an average of 8 minues calculating his next move</li>
+            </ul>
+            <div id="grandpaburger" class="play-button chess-btn">
+              <div>PLAY</div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    <%= link_to home_path do %>
+      <div class="back-home-button chess-btn">
+        Go Back Home
+      </div>
+    <% end %>
+  </div>
+
+  <div class="choose-color-modal-filter">
+    <div class="choose-color-modal">
+      <i id="close-modal" class="fa fa-times"></i>
+      <div id="choose-color-title">Play as...</div>
+      <div id="color-choices">
+        <div id="choose-white" class="choose-color"></div>
+        <div id="choose-black" class="choose-color"></div>
+      </div>
+    </div>
+  </div>
 
 </div>
 
 <script>
-	$(document).ready(function(){
-		$(".engine-name").click(function(){
-			if ($(this).siblings(".engine-description").is(":visible")) {
-				$(this).siblings(".engine-description").slideUp(150);
-				$(this).find(".caret1").removeClass("fa-caret-down").addClass("fa-caret-right");
-			} else {
-				$(".engine-description").slideUp(150);
-				$(".caret1").removeClass("fa-caret-down").addClass("fa-caret-right");
-				$(this).siblings(".engine-description").slideDown(150);
-				$(this).find(".caret1").removeClass("fa-caret-right").addClass("fa-caret-down");
-			}
-		});
-		$(".play-button").click(function(){
-			var ai = $(this).attr("id");
-			$(".choose-color-modal-filter").css({"display" : "flex"});
-			$(".choose-color").click(function(){
-				var color = $(this).attr("id");
-			  $.ajax({
-			    type: "POST",
-			    url: "/games",
-			    data: {
-			    	"ai" : ai,
-			    	"color" : color
-			    }
-			   });
-			});
-		});
-		$("#close-modal").click(function(){
-			$(".choose-color-modal-filter").css({"display" : "none"});
-		});
-	});
+  $(document).ready(function(){
+    $(".engine-name").click(function(){
+      if ($(this).siblings(".engine-description").is(":visible")) {
+        $(this).siblings(".engine-description").slideUp(150);
+        $(this).find(".caret1").removeClass("fa-caret-down").addClass("fa-caret-right");
+      } else {
+        $(".engine-description").slideUp(150);
+        $(".caret1").removeClass("fa-caret-down").addClass("fa-caret-right");
+        $(this).siblings(".engine-description").slideDown(150);
+        $(this).find(".caret1").removeClass("fa-caret-right").addClass("fa-caret-down");
+      }
+    });
+    $(".play-button").click(function(){
+      var ai = $(this).attr("id");
+      $(".choose-color-modal-filter").css({"display" : "flex"});
+      $(".choose-color").click(function(){
+        var color = $(this).attr("id");
+        $.ajax({
+          type: "POST",
+          url: "/games",
+          data: {
+            "ai" : ai,
+            "color" : color
+          }
+         });
+      });
+    });
+    $("#close-modal").click(function(){
+      $(".choose-color-modal-filter").css({"display" : "none"});
+    });
+  });
 </script>
