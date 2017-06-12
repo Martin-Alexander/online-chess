@@ -189,13 +189,23 @@ class EngineThought < ApplicationJob
             second_level_board = first_level_board.computer_move(move_two)
             second_level_board_moves = second_level_board.moves
             if second_level_board_moves.empty?
-              branch_one << [-999]
+              branch_one << [[-999]]
             else
               branch_one << branch_two
               second_level_board_moves.each do |move_three|
+                branch_three = []
                 third_level_board = second_level_board.computer_move(move_three)
-                board_eval = static_board_evaluation(third_level_board.board_data.to_board)
-                board_object.white_to_move ? branch_two <<  board_eval : branch_two << 0 - board_eval
+                third_level_board_moves = third_level_board.moves
+                if third_level_board_moves.empty?
+                  branch_two << [999]
+                else
+                  branch_two << branch_three
+                  third_level_board_moves.each do |move_four|
+                    fourth_level_board = third_level_board.computer_move(move_four)
+                    board_eval = static_board_evaluation(fourth_level_board.board_data.to_board)
+                    board_object.white_to_move ? branch_three <<  board_eval : branch_three << 0 - board_eval
+                  end
+                end
               end
             end
           end
