@@ -17,7 +17,8 @@ class EngineThought < ApplicationJob
   def perform(board_id, game_id, name)
     current_game = Game.find(game_id)
     initial_board = Board.find(board_id)
-    send(name.to_sym, initial_board, current_game)
+    # send(name.to_sym, initial_board, current_game)
+    engine_thought(initial_board, current_game, name)
   end
 
   PAWN_POS_EVAL = [
@@ -104,6 +105,12 @@ class EngineThought < ApplicationJob
     "king" => KING_POS_EVAL
   }
 
+  ENGINE_LOOKUP = {
+    mamaburger: :deep_thought,
+    papaburger: :smart_thought,
+    grandpaburger: :deeper_thought
+  }
+
   # ============ CHESS ENGINES ============
 
   def babyburger(initial_board, current_game)
@@ -126,7 +133,7 @@ class EngineThought < ApplicationJob
     send_back_board(computer_move_board, current_game)
   end
 
-  def mamaburger(initial_board, current_game)
+  def engine_thought(initial_board, current_game, name)
     if initial_board.moves.empty?
       puts "Game over"
       if initial_board.check_mate?
@@ -135,45 +142,7 @@ class EngineThought < ApplicationJob
         puts "Stalemate"
       end
     else
-      move_evaluations = deep_thought(initial_board)
-      best_move_index = move_evaluations.each_with_index.max[1]
-      computer_move_board = initial_board.move(initial_board.moves[best_move_index])
-      computer_move_board.game = current_game
-      computer_move_board.save!
-      puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
-      send_back_board(computer_move_board, current_game)
-    end
-  end
-
-  def papaburger(initial_board, current_game)
-    if initial_board.moves.empty?
-      puts "Game over"
-      if initial_board.check_mate?
-        puts "Checkmate"
-      else
-        puts "Stalemate"
-      end
-    else
-      move_evaluations = smart_thought(initial_board)
-      best_move_index = move_evaluations.each_with_index.max[1]
-      computer_move_board = initial_board.move(initial_board.moves[best_move_index])
-      computer_move_board.game = current_game
-      computer_move_board.save!
-      puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
-      send_back_board(computer_move_board, current_game)
-    end
-  end
-
-  def grandpaburger(initial_board, current_game)
-    if initial_board.moves.empty?
-      puts "Game over"
-      if initial_board.check_mate?
-        puts "Checkmate"
-      else
-        puts "Stalemate"
-      end
-    else
-      move_evaluations = deeper_thought(initial_board)
+      move_evaluations = send(ENGINE_LOOKUP[name.to_sym], (initial_board))
       best_move_index = move_evaluations.each_with_index.max[1]
       computer_move_board = initial_board.move(initial_board.moves[best_move_index])
       computer_move_board.game = current_game
