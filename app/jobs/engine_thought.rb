@@ -106,9 +106,9 @@ class EngineThought < ApplicationJob
   }
 
   ENGINE_LOOKUP = {
-    mamaburger: :deep_thought,
-    papaburger: :smart_thought,
-    grandpaburger: :deeper_thought
+    mamaburger: :mama_thought,
+    papaburger: :papa_thought,
+    grandpaburger: :grandpa_thought
   }
 
   # ============ CHESS ENGINES ============
@@ -178,38 +178,63 @@ class EngineThought < ApplicationJob
     return total_material_score
   end
 
-  def smart_thought(board_object)
-    
+  def papa_thought(board_object)
+
     parent, child = UNIXSocket.pair
     board_object.moves.each_with_index do |move_one, i|
       fork_with_new_connection do
         branch_one = []
         first_level_board = board_object.computer_move(move_one)
         first_level_board_moves = first_level_board.moves
-        if first_level_board_moves.empty?
+        if first_level_board_moves.empty? && first_level_board.check_mate?
           child.send "999Q #{i},", 0
+        elsif first_level_board_moves.empty? 
+          child.send "0Q #{i},", 0
         else
           first_level_board_moves.each do |move_two|
             branch_two = []
             second_level_board = first_level_board.computer_move(move_two)
             second_level_board_moves = second_level_board.moves
-            if second_level_board_moves.empty?
-              branch_one << [[-999]]
+            if second_level_board_moves.empty? && second_level_board.check_mate?
+              branch_one << [[[-999]]]
+            elsif second_level_board_moves.empty?
+              branch_one << [[[0]]]          
             else
               branch_one << branch_two
               second_level_board_moves.each do |move_three|
                 branch_three = []
                 third_level_board = second_level_board.computer_move(move_three)
+                # if move_three.capture || third_level_board.check?
                 if move_three.capture
                   third_level_board_moves = third_level_board.moves
-                  if third_level_board_moves.empty?
-                    branch_two << [999]
+                  if third_level_board_moves.empty? && third_level_board.check_mate?
+                    branch_two << [[999]]
+                  elsif third_level_board_moves.empty?
+                    branch_two << [[0]]
                   else
                     branch_two << branch_three
                     third_level_board_moves.each do |move_four|
+                      branch_four = []
                       fourth_level_board = third_level_board.computer_move(move_four)
-                      board_eval = static_board_evaluation(fourth_level_board.board_data.to_board)
-                      board_object.white_to_move ? branch_three <<  board_eval : branch_three << 0 - board_eval
+                      # if move_four.capture || fourth_level_board.check?
+                      if move_four.capture
+                        fourth_level_board_moves = fourth_level_board.moves
+                        if fourth_level_board_moves.empty? && fourth_level_board.check_mate?
+                          branch_thee << [-999]
+                        elsif fourth_level_board_moves.empty?
+                          branch_three << [0]
+                        else
+                          branch_three << branch_four
+                          fourth_level_board_moves.each do |move_five|
+                            fifth_level_board = fourth_level_board.move(move_five)
+                            board_eval = static_board_evaluation(fifth_level_board.board_data.to_board)
+                            board_object.white_to_move ? branch_four <<  board_eval : branch_four << 0 - board_eval                            
+                          end
+                        end
+                      else
+                        board_eval = static_board_evaluation(fourth_level_board.board_data.to_board)
+                        board_object.white_to_move ? branch_three <<  board_eval : branch_three << 0 - board_eval
+                      end
                     end
                   end
                 else
@@ -230,7 +255,7 @@ class EngineThought < ApplicationJob
     move_tree_parser parent.recv(10000)
   end
 
-  def deeper_thought(board_object)
+  def grandpa_thought(board_object)
     
     parent, child = UNIXSocket.pair
     board_object.moves.each_with_index do |move_one, i|
@@ -278,8 +303,7 @@ class EngineThought < ApplicationJob
   end
 
 
-  def deep_thought(board_object)
-    
+  def mama_thought(board_object)
     parent, child = UNIXSocket.pair
     board_object.moves.each_with_index do |move_one, i|
       fork_with_new_connection do
@@ -308,12 +332,28 @@ class EngineThought < ApplicationJob
         end
       end
     end
-
     Process.waitall
-
     end_time = Time.now
     move_tree_parser parent.recv(10000)
   end
+
+  # def deep_thought(board, board_moves, depth, branch)
+  #   if depth == 1
+  #     board_moves.each_with_index do |move, i|
+  #       new_branch = []
+  #       new_board = board.computer_move(move)
+  #       new_board_moves = new_board.moves
+  #       if board_moves.empty?
+  #         child.send "999Q #{i},", 0
+  #       else
+  #         deep_thought(new_board, new_board_moves, depth - 1, new_branch)
+  #       end
+  #     end
+  #   elsif depth < 2
+
+  #   else
+  #   end      
+  # end    
 
   def move_tree_parser(move_tree)
     move_tree = move_tree.split(",").each { |i| i.to_i }
