@@ -135,12 +135,14 @@ class EngineThought < ApplicationJob
         puts "Stalemate"
       end
     else
-      move_evaluations = tree_evaluator(deep_thought(initial_board))
-      best_move_index = move_evaluations.each_with_index.max[1]
-      computer_move_board = initial_board.move(initial_board.moves[best_move_index])
+      # move_evaluations = tree_evaluator(deep_thought(initial_board))
+      # best_move_index = move_evaluations.each_with_index.max[1]
+      move_index = deep_thought(initial_board)
+      puts move_index
+      computer_move_board = initial_board.move(initial_board.moves[move_index])
       computer_move_board.game = current_game
       computer_move_board.save!
-      puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
+      # puts "Board evaluation: #{move_evaluations.max.round(2)} #{move_evaluations.max > 0 ? ':)' : ':('}"
       send_back_board(computer_move_board, current_game)
     end
   end
@@ -172,6 +174,112 @@ class EngineThought < ApplicationJob
   end
 
   def deep_thought(board_object)
+    alpha_beta_thought(-999, 999, board_object.moves, board_object, 0, 2)
+  end
+
+  def alpha_beta_thought(alpha, beta, moves, board, depth, max_depth)
+
+    # Ultimately, the function will return the index of the inital branch 
+    # since that is what corresponds to the move to take rather than just
+    # the best possible outcome
+    branch_index = nil
+
+    # Alpha-beta function is always passed an array of moves
+    # Iterate through those moves and apply them to the given board
+    moves.each_with_index do |move, i|
+      
+      # Prune if alpha is greater than beta and return
+      # the appropriate value (alpha or beta)
+      if depth.even? && alpha > beta
+        return beta 
+      elsif depth.odd? && alpha > beta
+        return alpha
+      end
+
+      # The algorithm has still a ways to go down in the search tree if the current
+      # depth is greater than the maximum depth
+      if depth < max_depth
+
+        # If depth is even (i.e., if it's a maximizing node)
+        if depth.even?
+
+          # Apply move to board thereby creating a new board
+          new_board = board.computer_move(move)
+
+          # Generate moves (the most computationally expensive action)
+          new_moves = new_board.moves
+
+          # Call alpha-beta, passing it the list of generate moves and the board that 
+          # was used to generate them, and increase the depth
+          pre_alpha = alpha_beta_thought(alpha, beta, new_moves, new_board, depth + 1, max_depth)
+
+          # If the alpha passed back up is better (i.e., greater) than the current alpha
+          # then update it accordingly
+          if pre_alpha > alpha
+            
+            # If the function is evaluating children of the root node then update the
+            # the branch index which indicates current highest alpha (i.e., best move)
+            if depth.zero?
+              branch_index = i
+            end
+
+            alpha = pre_alpha
+          end
+
+        # The same process for minimizing nodes except with the need for branch index updates
+        else
+
+          # Apply move
+          new_board = board.computer_move(move)
+
+          # Generate moves
+          new_moves = new_board.moves
+
+          # Call alpha-beta
+          pre_beta = alpha_beta_thought(alpha, beta, new_moves, new_board, depth + 1, max_depth)
+
+          # Update beta accordingly
+          beta = pre_beta if pre_beta < beta          
+        end
+
+      # The algorithm has reached a leaf node
+      else
+
+        # Apply move
+        leaf_board = board.computer_move(move)
+
+        # Perform a static evaluation
+        evaluation = 0 - static_board_evaluation(leaf_board.board_data.to_board)
+
+        # If at a maximizing node update alpha with evaluation if it is greater
+        # than current alpha
+        if depth.even? && evaluation > alpha
+          alpha = evaluation
+
+        # Or, if at a minimizing node, update beta with evaluation if is less
+        # than the current beta
+        elsif depth.odd? && evaluation < beta
+          beta = evaluation
+        end
+      end
+    end
+    
+    # If it is the root node return the branch index rather than the alpha
+    if depth.zero?
+      return branch_index
+
+    # Otherwise, return alpha if at a maximizing node
+    elsif depth.even?
+      return alpha
+
+    # Or the beta if at a minimizing node
+    else
+      return beta
+    end
+
+  end
+
+  def deep_thought_OLD(board_object)
     start_time = Time.now
     tree = []
     board_object.moves.each_with_index do |move_one, i|
