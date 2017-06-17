@@ -174,7 +174,7 @@ class EngineThought < ApplicationJob
   end
 
   def deep_thought(board_object)
-    alpha_beta_thought(-999, 999, board_object.moves, board_object, 0, 2)
+    alpha_beta_thought(-99, 99, board_object.moves, board_object, 0, 2)
   end
 
   def alpha_beta_thought(alpha, beta, moves, board, depth, max_depth)
@@ -183,6 +183,14 @@ class EngineThought < ApplicationJob
     # since that is what corresponds to the move to take rather than just
     # the best possible outcome
     branch_index = nil
+
+    if moves.empty?        
+      if depth.even?
+        alpha = -999
+      elsif depth.odd? 
+        beta = 999
+      end
+    end
 
     # Alpha-beta function is always passed an array of moves
     # Iterate through those moves and apply them to the given board
