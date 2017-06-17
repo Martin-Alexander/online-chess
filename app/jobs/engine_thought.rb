@@ -186,9 +186,17 @@ class EngineThought < ApplicationJob
 
     if moves.empty?        
       if depth.even?
-        alpha = -999
-      elsif depth.odd? 
-        beta = 999
+        if board.check_mate?
+          alpha = -999
+        else
+          alpha = 0
+        end
+      elsif depth.odd?
+        if board.check_mate?
+          beta = 999
+        else
+          beta = 0
+        end
       end
     end
 
