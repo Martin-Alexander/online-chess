@@ -84,7 +84,7 @@ class Board < ApplicationRecord
     if board_copy[move.start_square[0]][move.start_square[1]].color == "white"
       promoted_piece = move.promotion
     else 
-      promoted_piece = move.promotion * -1
+      promoted_piece = 0 - move.promotion
     end
     piece_on_arrival = move.promotion.zero? ? board_copy[move.start_square[0]][move.start_square[1]] : promoted_piece
     board_copy[move.end_square[0]][move.end_square[1]] = piece_on_arrival
