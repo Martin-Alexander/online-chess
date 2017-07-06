@@ -18,7 +18,11 @@ class EngineThought < ApplicationJob
     current_game = Game.find(game_id)
     initial_board = Board.find(board_id)
     # send(name.to_sym, initial_board, current_game)
-    engine_thought(initial_board, current_game, name)
+    if ["babyburger", "teenburger"].include?(name)
+      send(name.to_sym, initial_board, current_game)
+    else
+      engine_thought(initial_board, current_game, name)
+    end
   end
 
   PAWN_POS_EVAL = [
@@ -204,8 +208,8 @@ class EngineThought < ApplicationJob
               second_level_board_moves.each do |move_three|
                 branch_three = []
                 third_level_board = second_level_board.computer_move(move_three)
-                # if move_three.capture || third_level_board.check?
-                if move_three.capture
+                if move_three.capture || third_level_board.check?
+                # if move_three.capture
                   third_level_board_moves = third_level_board.moves
                   if third_level_board_moves.empty? && third_level_board.check_mate?
                     branch_two << [[999]]
@@ -217,24 +221,24 @@ class EngineThought < ApplicationJob
                       branch_four = []
                       fourth_level_board = third_level_board.computer_move(move_four)
                       # if move_four.capture || fourth_level_board.check?
-                      if move_four.capture
-                        fourth_level_board_moves = fourth_level_board.moves
-                        if fourth_level_board_moves.empty? && fourth_level_board.check_mate?
-                          branch_thee << [-999]
-                        elsif fourth_level_board_moves.empty?
-                          branch_three << [0]
-                        else
-                          branch_three << branch_four
-                          fourth_level_board_moves.each do |move_five|
-                            fifth_level_board = fourth_level_board.move(move_five)
-                            board_eval = static_board_evaluation(fifth_level_board.board_data.to_board)
-                            board_object.white_to_move ? branch_four <<  board_eval : branch_four << 0 - board_eval                            
-                          end
-                        end
-                      else
+                      # if move_four.capture
+                      #   fourth_level_board_moves = fourth_level_board.moves
+                      #   if fourth_level_board_moves.empty? && fourth_level_board.check_mate?
+                      #     branch_thee << [-999]
+                      #   elsif fourth_level_board_moves.empty?
+                      #     branch_three << [0]
+                      #   else
+                      #     branch_three << branch_four
+                      #     fourth_level_board_moves.each do |move_five|
+                      #       fifth_level_board = fourth_level_board.move(move_five)
+                      #       board_eval = static_board_evaluation(fifth_level_board.board_data.to_board)
+                      #       board_object.white_to_move ? branch_four <<  board_eval : branch_four << 0 - board_eval                            
+                      #     end
+                      #   end
+                      # else
                         board_eval = static_board_evaluation(fourth_level_board.board_data.to_board)
                         board_object.white_to_move ? branch_three <<  board_eval : branch_three << 0 - board_eval
-                      end
+                      # end
                     end
                   end
                 else
